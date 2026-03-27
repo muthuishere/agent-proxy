@@ -1,0 +1,12 @@
+# Domains that should NEVER be intercepted regardless of heuristics or intercept_all.
+# Add domains here that you know are safe, internal tooling, or where
+# interception causes problems (e.g. corporate SSO, package registries).
+excluded_domains:
+  - pypi.org
+  - files.pythonhosted.org
+  - registry.npmjs.org
+  - github.com
+  - githubusercontent.com
+  - accounts.google.com
+  - login.microsoftonline.com
+  - ab.chatgpt.com

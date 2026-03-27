@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$SCRIPT_DIR"
+
+[ -f .env ] && export $(grep -v '^#' .env | xargs)
+
+HOST="${PROXY_HOST:-127.0.0.1}"
+PORT="${PROXY_PORT:-7717}"
+CONFIG="${CONFIG_FILE:-./config/agentproxy.yaml}"
+
+echo "Starting AgentProxy on ${HOST}:${PORT}"
+
+# Resolve upstream proxy args (empty string if no upstream configured/detected)
+# proxy.upstream prints "--mode upstream:URL [--upstream-auth user:pass]" or nothing
+UPSTREAM_ARGS=$(uv run python -m proxy.upstream "$CONFIG" 2>/dev/null) || UPSTREAM_ARGS=""
+
+# Build mitmdump argument list
+ARGS=(
+  --listen-host "$HOST"
+  --listen-port "$PORT"
+  -s proxy/addon.py
+  --ssl-insecure
+)
+
+if [ -n "$UPSTREAM_ARGS" ]; then
+  # Split the upstream args string into individual array elements
+  IFS=' ' read -ra UPSTREAM_ARR <<< "$UPSTREAM_ARGS"
+  ARGS+=("${UPSTREAM_ARR[@]}")
+fi
+
+uv run mitmdump "${ARGS[@]}"

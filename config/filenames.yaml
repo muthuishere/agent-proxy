@@ -1,0 +1,67 @@
+sensitive_filenames:
+
+  - pattern: '.env'
+    match: exact
+    type: env_file
+    action: scan_contents
+
+  - pattern: '.env.*'
+    match: glob
+    type: env_file
+    action: scan_contents
+
+  - pattern: '*.pem'
+    match: glob
+    type: cert
+    action: scan_contents
+
+  - pattern: '*.key'
+    match: glob
+    type: cert
+    action: scan_contents
+
+  - pattern: 'id_rsa'
+    match: exact
+    type: cert
+    action: flag_and_mask_all
+
+  - pattern: 'id_ed25519'
+    match: exact
+    type: cert
+    action: flag_and_mask_all
+
+  - pattern: 'credentials.json'
+    match: exact
+    type: credentials_file
+    action: scan_contents
+
+  - pattern: 'service-account.json'
+    match: exact
+    type: credentials_file
+    action: scan_contents
+
+  - pattern: 'credentials'
+    path_contains: '.aws'
+    match: exact
+    type: aws_credentials
+    action: flag_and_mask_all
+
+  - pattern: 'kubeconfig'
+    match: exact
+    type: kubeconfig
+    action: flag_and_mask_all
+
+  - pattern: '*.tfvars'
+    match: glob
+    type: terraform_vars
+    action: scan_contents
+
+  - pattern: '.git-credentials'
+    match: exact
+    type: git_credentials
+    action: flag_and_mask_all
+
+  - pattern: '.netrc'
+    match: exact
+    type: netrc
+    action: flag_and_mask_all

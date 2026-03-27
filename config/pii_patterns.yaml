@@ -1,0 +1,26 @@
+patterns:
+
+  - name: EMAIL_ADDRESS
+    regex: '\b[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}\b'
+    type: pii_email
+    confidence: high
+
+  - name: PHONE_NUMBER
+    regex: '(?<!\w)(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}(?!\w)'
+    type: pii_phone
+    confidence: medium
+
+  - name: US_SSN
+    regex: '\b\d{3}-\d{2}-\d{4}\b'
+    type: pii_ssn
+    confidence: high
+
+  - name: CREDIT_CARD
+    regex: '\b(?:4\d{3}|5[1-5]\d{2}|3[47]\d{2}|6(?:011|5\d{2}))(?:[- ]?\d{4}){3}\b'
+    type: pii_credit_card
+    confidence: medium
+
+  - name: IPV4_ADDRESS
+    regex: '\b(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}\b'
+    type: pii_ip
+    confidence: medium

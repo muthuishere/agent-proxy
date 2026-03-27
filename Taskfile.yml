@@ -1,0 +1,50 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  install:
+    desc: "Install AgentProxy (deps, CA cert, wrapper scripts)"
+    cmds:
+      - python install.py
+
+  uninstall:
+    desc: "Remove AgentProxy (wrapper scripts, CA cert trust)"
+    cmds:
+      - python install.py uninstall
+
+  start:
+    desc: "Start the proxy"
+    cmds:
+      - bash bin/agentproxy-start
+
+  test:
+    desc: "Run tests"
+    cmds:
+      - uv run pytest tests/ -v
+
+  test-e2e-claude:
+    desc: "Run Claude end-to-end masking test"
+    cmds:
+      - bash tests/e2e_claude_test.sh
+
+  test-cov:
+    desc: "Run tests with coverage"
+    cmds:
+      - uv run pytest tests/ -v --cov=proxy --cov-report=term-missing
+
+  build:
+    desc: "Sync Python dependencies"
+    cmds:
+      - uv sync
+
+  clean:
+    desc: "Remove build artifacts and virtualenv"
+    cmds:
+      - rm -rf __pycache__ proxy/__pycache__ tests/__pycache__
+      - rm -rf .pytest_cache .coverage .venv
+
+  add-dep:
+    desc: "Add a dependency  (task add-dep -- package-name)"
+    cmds:
+      - uv add {{.CLI_ARGS}}

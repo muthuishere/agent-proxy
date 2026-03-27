@@ -1,0 +1,56 @@
+proxy:
+  port: 7717
+  host: 127.0.0.1
+
+tls:
+  cert_dir: ./certs
+
+detection:
+  pattern_file: ./config/patterns.yaml
+  scan_workers: 4
+  intercepted_domains:
+    - api.anthropic.com
+    - api.openai.com
+    - chatgpt.com
+    - api.githubcopilot.com
+    - api.individual.githubcopilot.com
+    - copilot-proxy.githubusercontent.com
+    - api.github.com
+  # Add any domain here to intercept its traffic and mask secrets.
+  # Examples:
+  #   - localhost:4000      # LiteLLM or other local gateway
+  #   - my.ollama.host:11434
+
+pii:
+  enabled: false
+  pattern_file: ./config/pii_patterns.yaml
+  scan_workers: 4
+  entities:
+    - email
+    - phone
+    - ssn
+    - credit_card
+    - ip_address
+
+masking:
+  show_prefix_chars: 4
+  show_suffix_chars: 4
+  star_length: 24
+
+logging:
+  log_file: ./logs/traffic.jsonl
+  log_request_body: true
+  log_response_body: true
+  log_originals: false
+  log_passthrough: false      # set true to log non-intercepted domains (debug only)
+
+upstream_proxy:
+  auto_detect: true    # read HTTP_PROXY/HTTPS_PROXY from env and OS system settings
+  url: ""              # explicit override: e.g. http://corp.proxy:8080
+  username: ""         # proxy username (or embed in url: http://user:pass@proxy:8080)
+  password: ""         # proxy password
+  pac_file: ""         # PAC file path or URL: /etc/proxy.pac  or  http://wpad/wpad.dat
+                       # PAC support requires: uv add pypac
+
+org:
+  name: ""
