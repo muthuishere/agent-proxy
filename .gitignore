@@ -9,3 +9,12 @@ certs/
 logs/
 dist/
 *.egg-info/
+
+# Go build artifacts
+/agentproxy
+/agentproxy.exe
+*.test
+*.out
+
+# BMAD planning workspace (local-only artifacts)
+_bmad-output/

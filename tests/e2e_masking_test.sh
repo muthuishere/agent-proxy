@@ -29,7 +29,7 @@ echo ""
 
 HTTP_PROXY="http://127.0.0.1:7717" \
 HTTPS_PROXY="http://127.0.0.1:7717" \
-SSL_CERT_FILE="$HOME/.mitmproxy/mitmproxy-ca-cert.pem" \
+SSL_CERT_FILE="$HOME/.agentproxy/certs/agentproxy-ca-cert.pem" \
   codex exec "$PROMPT" 2>&1
 
 echo ""

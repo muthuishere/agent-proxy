@@ -4,9 +4,35 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [ -f "$SCRIPT_DIR/.env" ] && export $(grep -v '^#' "$SCRIPT_DIR/.env" | xargs)
 
-HOST="${PROXY_HOST:-127.0.0.1}"
-PORT="${PROXY_PORT:-7717}"
-CERT_PATH="${AGENTPROXY_CA_CERT:-$HOME/.mitmproxy/mitmproxy-ca-cert.pem}"
+# --no-proxy: bypass AgentProxy entirely and exec the agent directly. Useful
+# when AgentProxy itself is broken or for A/B comparing behaviour.
+if [ "${1:-}" = "--no-proxy" ]; then
+  shift
+  exec claude "$@"
+fi
+
+resolve_agentproxy() {
+  if command -v agentproxy >/dev/null 2>&1; then
+    command -v agentproxy
+    return
+  fi
+  if [ -x "$SCRIPT_DIR/agentproxy" ]; then
+    printf '%s\n' "$SCRIPT_DIR/agentproxy"
+    return
+  fi
+  printf 'go run ./cmd/agentproxy'
+}
+
+HOST="${AGENTPROXY_HOST:-127.0.0.1}"
+PORT="${AGENTPROXY_PORT:-7717}"
+CERT_PATH="${AGENTPROXY_CA_CERT:-$HOME/.agentproxy/certs/agentproxy-ca-cert.pem}"
+AGENTPROXY_BIN="$(resolve_agentproxy)"
+
+if ! (cd "$SCRIPT_DIR" && $AGENTPROXY_BIN status --host "$HOST" --port "$PORT" -q >/dev/null 2>&1); then
+  echo "AgentProxy is not running on ${HOST}:${PORT}"
+  echo "Start it with: agentproxy-start"
+  exit 1
+fi
 
 export HTTP_PROXY="http://${HOST}:${PORT}"
 export HTTPS_PROXY="http://${HOST}:${PORT}"

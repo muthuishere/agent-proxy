@@ -2,32 +2,133 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$SCRIPT_DIR"
+[ -f "$SCRIPT_DIR/.env" ] && export $(grep -v '^#' "$SCRIPT_DIR/.env" | xargs)
 
-[ -f .env ] && export $(grep -v '^#' .env | xargs)
+resolve_agentproxy() {
+  if command -v agentproxy >/dev/null 2>&1; then
+    command -v agentproxy
+    return
+  fi
+  if [ -x "$SCRIPT_DIR/agentproxy" ]; then
+    printf '%s\n' "$SCRIPT_DIR/agentproxy"
+    return
+  fi
+  printf 'go run ./cmd/agentproxy'
+}
 
-HOST="${PROXY_HOST:-127.0.0.1}"
-PORT="${PROXY_PORT:-7717}"
-CONFIG="${CONFIG_FILE:-./config/agentproxy.yaml}"
+find_listener_pids() {
+  local port="$1"
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -tiTCP:"$port" -sTCP:LISTEN 2>/dev/null || true
+    return
+  fi
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltnp "( sport = :$port )" 2>/dev/null | awk -F'pid=' 'NF>1 {split($2,a,","); print a[1]}' | sort -u || true
+    return
+  fi
+}
 
-echo "Starting AgentProxy on ${HOST}:${PORT}"
+pid_command() {
+  local pid="$1"
+  ps -p "$pid" -o command= 2>/dev/null || true
+}
 
-# Resolve upstream proxy args (empty string if no upstream configured/detected)
-# proxy.upstream prints "--mode upstream:URL [--upstream-auth user:pass]" or nothing
-UPSTREAM_ARGS=$(uv run python -m proxy.upstream "$CONFIG" 2>/dev/null) || UPSTREAM_ARGS=""
+all_listeners_are_agentproxy() {
+  local port="$1"
+  local pids cmd
+  pids="$(find_listener_pids "$port")"
+  [ -n "$pids" ] || return 1
+  while IFS= read -r pid; do
+    [ -n "$pid" ] || continue
+    cmd="$(pid_command "$pid")"
+    case "$cmd" in
+      *agentproxy*|*"go run ./cmd/agentproxy"*|*"cmd/agentproxy"*) ;;
+      *) return 1 ;;
+    esac
+  done <<< "$pids"
+  return 0
+}
 
-# Build mitmdump argument list
-ARGS=(
-  --listen-host "$HOST"
-  --listen-port "$PORT"
-  -s proxy/addon.py
-  --ssl-insecure
-)
+kill_listener_pids() {
+  local port="$1"
+  local pids
+  pids="$(find_listener_pids "$port")"
+  if [ -z "$pids" ]; then
+    return 1
+  fi
+  while IFS= read -r pid; do
+    [ -n "$pid" ] || continue
+    kill "$pid"
+  done <<< "$pids"
+  return 0
+}
 
-if [ -n "$UPSTREAM_ARGS" ]; then
-  # Split the upstream args string into individual array elements
-  IFS=' ' read -ra UPSTREAM_ARR <<< "$UPSTREAM_ARGS"
-  ARGS+=("${UPSTREAM_ARR[@]}")
+HOST="${AGENTPROXY_HOST:-}"
+PORT="${AGENTPROXY_PORT:-}"
+RESTART=0
+
+agentproxy_bin="$(resolve_agentproxy)"
+
+set --
+for arg in "$@"; do
+  if [ "$arg" = "--restart" ]; then
+    RESTART=1
+    continue
+  fi
+  set -- "$@" "$arg"
+done
+if [ -n "$PORT" ]; then
+  set -- --port "$PORT" "$@"
+fi
+if [ -n "$HOST" ]; then
+  set -- --host "$HOST" "$@"
 fi
 
-uv run mitmdump "${ARGS[@]}"
+resolved_host="${HOST:-127.0.0.1}"
+resolved_port="${PORT:-7717}"
+
+if (cd "$SCRIPT_DIR" && $agentproxy_bin status --host "$resolved_host" --port "$resolved_port" -q >/dev/null 2>&1) && all_listeners_are_agentproxy "$resolved_port"; then
+  if [ "$RESTART" -ne 1 ] && [ -t 0 ]; then
+    printf 'AgentProxy is already running on %s:%s. Restart it? [y/N] ' "$resolved_host" "$resolved_port"
+    read -r answer
+    case "$answer" in
+      y|Y|yes|YES) RESTART=1 ;;
+      *)
+        echo "Leaving the existing AgentProxy process running."
+        exit 0
+        ;;
+    esac
+  fi
+
+  if [ "$RESTART" -ne 1 ]; then
+    echo "AgentProxy is already running on ${resolved_host}:${resolved_port}."
+    echo "Use: agentproxy-start --restart"
+    exit 0
+  fi
+
+  if ! kill_listener_pids "$resolved_port"; then
+    echo "AgentProxy is already running on ${resolved_host}:${resolved_port}, but the wrapper could not stop it automatically."
+    echo "Stop it manually or re-run with the process terminated."
+    exit 1
+  fi
+  sleep 1
+fi
+
+listener_pids="$(find_listener_pids "$resolved_port")"
+if [ -n "$listener_pids" ]; then
+  echo "Port ${resolved_port} is already in use by another process."
+  echo "Free the port or change AGENTPROXY_PORT before starting AgentProxy."
+  exit 1
+fi
+
+# Prefer binary installed to PATH, then repo-local build
+if command -v agentproxy &>/dev/null; then
+  exec agentproxy start "$@"
+fi
+
+if [ -x "$SCRIPT_DIR/agentproxy" ]; then
+  exec "$SCRIPT_DIR/agentproxy" start "$@"
+fi
+
+cd "$SCRIPT_DIR"
+exec go run ./cmd/agentproxy start "$@"

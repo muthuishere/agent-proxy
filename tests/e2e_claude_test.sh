@@ -68,7 +68,7 @@ env_block = "\n".join([
     "ADMIN_EMAIL=alice@example.com",
 ])
 encoded_conn = base64.b64encode(raw_conn.encode()).decode()
-url_encoded_conn = urllib.parse.quote(raw_conn)
+url_encoded_conn = urllib.parse.quote(raw_conn, safe="")
 
 cases = [
     {
@@ -188,7 +188,7 @@ request_events = [
 ]
 message_events = [
     event for event in request_events
-    if event.get("path") == "/v1/messages?beta=true"
+    if event.get("path", "").startswith("/v1/messages")
 ]
 
 print("=== REQUEST SUMMARY ===\n")

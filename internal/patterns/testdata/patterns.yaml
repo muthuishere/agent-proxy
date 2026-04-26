@@ -1,0 +1,20 @@
+patterns:
+
+  - name: OPENAI_API_KEY
+    type: regex
+    pattern: 'sk-(proj-)?[A-Za-z0-9\-_]{20,}'
+    category: apikey
+    confidence: certain
+
+  - name: GITHUB_TOKEN
+    type: prefix
+    value: 'ghp_'
+    category: apikey
+    confidence: certain
+
+  - name: CUSTOM_SECRET
+    type: contains_between
+    block_start: '-----BEGIN PRIVATE KEY-----'
+    block_end: '-----END PRIVATE KEY-----'
+    category: cert
+    confidence: high

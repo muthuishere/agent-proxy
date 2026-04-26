@@ -6,14 +6,14 @@ This document captures the current validated behavior, regression history, and s
 
 ## Project Scope
 
-AgentProxy is a local `mitmproxy`-based proxy that intercepts AI client traffic, masks secrets before they leave the machine, and restores masked placeholders on the way back so the client still behaves normally.
+AgentProxy is a local Go-based proxy that intercepts AI client traffic, replaces secrets with shape-preserving vault surrogates before they leave the machine, and restores exact surrogate matches on the way back so the client still behaves normally.
 
 Primary code paths:
 
-- `proxy/addon.py`: request, response, and websocket masking pipeline
-- `proxy/scanner.py`: regex scanner with configurable worker count
-- `proxy/decoder.py`: base64, hex, and URL-encoded decoding and re-encoding
-- `proxy/vault.py`: reversible placeholder store
+- `internal/proxy/server.go`: request, response, and websocket proxy integration
+- `internal/scanner/scanner.go`: regex scanner with configurable worker count
+- `internal/codec/encoded.go`: base64, hex, and URL-encoded decoding and re-encoding
+- `internal/vault/session.go`: reversible surrogate store
 - `config/patterns.yaml`: default secret patterns
 - `config/pii_patterns.yaml`: optional PII patterns
 - `tests/e2e_claude_test.sh`: live Claude end-to-end verification
@@ -60,13 +60,13 @@ Validated locally as of `2026-03-27`.
 ### Core unit/integration
 
 ```bash
-uv run pytest tests/ -v
+go test ./...
 ```
 
 ### Focused scanner/addon checks
 
 ```bash
-uv run pytest tests/test_scanner.py tests/test_addon.py tests/test_decoder_encoded.py -v
+go test ./internal/scanner ./internal/runtime ./internal/codec
 ```
 
 ### Claude end-to-end
@@ -114,7 +114,7 @@ These scenarios should remain green before testing new clients or changing maski
 
 - plain HTTP request body
 - gzip-compressed request body
-- intercepted response restoring vault placeholders
+- intercepted response restoring vault surrogates
 - websocket client-to-server masking
 - websocket server-to-client restoration
 
@@ -146,7 +146,7 @@ These are the current Claude-first acceptance scenarios.
 3. Prompt containing base64 and URL-encoded copies of the Postgres URL
 4. Long AGENTS-style prompt with noisy YAML, shell exports, and an OpenSSH private key block
 5. Verify Claude still returns the exact expected response text
-6. Verify `logs/traffic.jsonl` contains masked placeholders and no raw secrets
+6. Verify `logs/traffic.jsonl` contains shape-preserving surrogates and no raw secrets
 
 ## Codex Scenarios To Re-Run
 
@@ -170,9 +170,9 @@ These were intentionally deferred and should be treated as future work:
 
 These areas need extra care when modifying the implementation:
 
-- encoded blob masking in `proxy/decoder.py`
+- encoded blob masking in `internal/codec/encoded.go`
 - regex broadening that can break JSON structure
-- reversible restore behavior in `proxy/vault.py`
+- reversible restore behavior in `internal/vault/session.go`
 - websocket frame handling
 - long-lived vault retention and cross-request secret lifetime
 - mismatch between documented behavior and what is actually implemented
@@ -181,17 +181,19 @@ These areas need extra care when modifying the implementation:
 
 These are not solved just by the current green tests:
 
-- encoded-secret masking still uses inline `[MASKED:...]` markers instead of full vault restoration semantics
-- vault lifetime is process-wide and not request-scoped
-- Copilot coverage is not complete
-- PII is regex-only today; contextual PII detection is not implemented
-- streaming/SSE chunk-split placeholder restoration is still a known limitation
+- SSE response handling: `internal/proxy/server.go` currently buffers the full response body before scanning; for `text/event-stream` responses this blocks streaming delivery to the client until the stream ends. Track F must wire per-event + `NormalizeEventData` to process events as they arrive.
+- Copilot coverage is not complete.
+- PII is regex-only today; contextual PII detection is not implemented.
+
+## Resolved Gaps (previously open)
+
+- ~~encoded-secret masking still uses inline `[MASKED:...]` markers~~: masking uses reversible vault session tokens (`internal/vault/session.go`); restoration is handled by `Session.Restore` and `RestoreEncodedBlobs`.
+- ~~vault lifetime is process-wide and not request-scoped~~: vault is session-scoped via `vault.Manager`; `CloseSession` is called on connection teardown.
+- ~~streaming/SSE chunk-split surrogate restoration is still a known limitation~~: `NormalizeEventData` + per-event buffering in `go-spikes/sse` proves detection of both chunk-split and data-boundary-split secrets; production wiring is Track F.
 
 ## Recommended Next Steps
 
-1. Add Claude e2e variants for PII `enabled: false` and `enabled: true`
-2. Add Codex e2e with AWS and OpenSSH payloads
-3. Add request-scoped or session-scoped vault eviction rules
-4. Decide whether encoded-secret masking should become fully reversible
-5. Add Copilot real-host interception and e2e once Claude and Codex are stable
-
+1. **Track F**: wire SSE per-event scanning with `NormalizeEventData` into `internal/proxy/server.go` for `Content-Type: text/event-stream` responses.
+2. Add Claude e2e variants for PII `enabled: false` and `enabled: true` under `tests/go/`.
+3. Add Codex e2e with AWS and OpenSSH payloads under `tests/go/`.
+4. Add Copilot real-host interception and e2e once Claude and Codex are stable.

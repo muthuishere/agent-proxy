@@ -1,0 +1,30 @@
+root = "."
+tmp_dir = "tmp/air"
+
+[build]
+cmd = "go build -o agentproxy ./cmd/agentproxy"
+bin = "./agentproxy"
+full_bin = "bash bin/agentproxy-start --restart"
+delay = 1000
+exclude_dir = [
+  ".git",
+  ".venv",
+  "_bmad",
+  "_bmad-output",
+  "certs",
+  "logs",
+  "third_party",
+  "tmp",
+]
+exclude_file = ["agentproxy"]
+exclude_regex = ["_test\\.go"]
+include_ext = ["go", "html", "yaml", "yml"]
+kill_delay = "500ms"
+send_interrupt = true
+stop_on_error = true
+
+[log]
+time = true
+
+[misc]
+clean_on_exit = true

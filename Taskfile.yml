@@ -4,47 +4,126 @@ dotenv: ['.env']
 
 tasks:
   install:
-    desc: "Install AgentProxy (deps, CA cert, wrapper scripts)"
+    desc: "Build binary, export CA cert, trust it when possible, and install wrappers"
     cmds:
-      - python install.py
+      - bash install.sh
+
+  install-trust:
+    desc: "Backward-compatible alias for install"
+    cmds:
+      - bash install.sh
 
   uninstall:
-    desc: "Remove AgentProxy (wrapper scripts, CA cert trust)"
+    desc: "Remove binary, certs, runtime directories, and OS CA trust"
     cmds:
-      - python install.py uninstall
+      - bash uninstall.sh
+
+  uninstall-trust:
+    desc: "Backward-compatible alias for uninstall"
+    cmds:
+      - bash uninstall.sh --trust
+
+  build:
+    desc: "Build the Go binary"
+    cmds:
+      - go build -o agentproxy ./cmd/agentproxy
+
+  prepare-local:
+    desc: "Set up local dev binary, CA trust, and ~/.local/bin symlinks"
+    cmds:
+      - go build -o agentproxy ./cmd/agentproxy
+      - task ca-setup
+      - mkdir -p "$HOME/.local/bin"
+      - ln -sf "$(pwd)/agentproxy" "$HOME/.local/bin/agentproxy"
+      - ln -sf "$(pwd)/bin/claudeproxy" "$HOME/.local/bin/claudeproxy"
+      - ln -sf "$(pwd)/bin/codexproxy" "$HOME/.local/bin/codexproxy"
+      - ln -sf "$(pwd)/bin/copilotproxy" "$HOME/.local/bin/copilotproxy"
+      - ln -sf "$(pwd)/bin/agentproxy-start" "$HOME/.local/bin/agentproxy-start"
+      - echo "Local dev setup ready in $HOME/.local/bin"
+
+  dev:
+    desc: "Run AgentProxy with Air auto-rebuild/restart on code changes"
+    cmds:
+      - task prepare-local
+      - |
+        if command -v air >/dev/null 2>&1; then
+          air -c .air.toml
+        else
+          go run github.com/air-verse/air@latest -c .air.toml
+        fi
 
   start:
-    desc: "Start the proxy"
+    desc: "Start the proxy with web dashboard (http://127.0.0.1:7718)"
     cmds:
       - bash bin/agentproxy-start
 
-  test:
-    desc: "Run tests"
+  start-no-ui:
+    desc: "Start the proxy without web dashboard"
     cmds:
-      - uv run pytest tests/ -v
+      - ./agentproxy start --ui-port 0
+
+  test:
+    desc: "Run all Go tests"
+    cmds:
+      - go test ./...
+
+  test-acceptance:
+    desc: "Run CI-runnable acceptance tests (no live API required)"
+    cmds:
+      - go test ./tests/go/ -v
 
   test-e2e-claude:
-    desc: "Run Claude end-to-end masking test"
+    desc: "Run live Claude e2e test (proxy must be running, ANTHROPIC_API_KEY required)"
     cmds:
       - bash tests/e2e_claude_test.sh
 
-  test-cov:
-    desc: "Run tests with coverage"
+  test-e2e-masking:
+    desc: "Run live Codex/masking e2e test (proxy must be running, OPENAI_API_KEY required)"
     cmds:
-      - uv run pytest tests/ -v --cov=proxy --cov-report=term-missing
+      - bash tests/e2e_masking_test.sh
 
-  build:
-    desc: "Sync Python dependencies"
+  test-non-disruption:
+    desc: "Manual: verify unrelated HTTPS hosts still work (requires running proxy + trusted CA)"
     cmds:
-      - uv sync
+      - bash tests/integration/non-disruption/test-non-disruption.sh
+
+  test-e2e-agents:
+    desc: "Manual: drive Claude+Codex+Copilot CLIs through the proxy end-to-end (proxy must be running; burns API quota)"
+    cmds:
+      - bash tests/integration/e2e-agents/test-all-e2e.sh
+
+  test-e2e-claude-cli:
+    desc: "Manual: Claude CLI via claudeproxy (single-turn + --continue)"
+    cmds:
+      - bash tests/integration/e2e-agents/test-claude-e2e.sh
+
+  test-e2e-codex-cli:
+    desc: "Manual: Codex CLI via codexproxy (WebSocket; resume --last)"
+    cmds:
+      - bash tests/integration/e2e-agents/test-codex-e2e.sh
+
+  test-e2e-copilot-cli:
+    desc: "Manual: Copilot CLI via copilotproxy (asserts api.github.com NOT intercepted)"
+    cmds:
+      - bash tests/integration/e2e-agents/test-copilot-e2e.sh
+
+  test-cov:
+    desc: "Run all Go tests with coverage report"
+    cmds:
+      - go test ./... -cover
+
+  ca-setup:
+    desc: "Export CA cert, create runtime directories, and trust it in the OS store"
+    cmds:
+      - ./agentproxy ca-setup --no-trust-instructions
+      - bash scripts/trust-ca.sh
+
+  validate:
+    desc: "Validate config and startup file paths"
+    cmds:
+      - ./agentproxy validate
 
   clean:
-    desc: "Remove build artifacts and virtualenv"
+    desc: "Remove Go build artifacts"
     cmds:
-      - rm -rf __pycache__ proxy/__pycache__ tests/__pycache__
-      - rm -rf .pytest_cache .coverage .venv
-
-  add-dep:
-    desc: "Add a dependency  (task add-dep -- package-name)"
-    cmds:
-      - uv add {{.CLI_ARGS}}
+      - rm -f agentproxy

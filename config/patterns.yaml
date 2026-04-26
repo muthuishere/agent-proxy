@@ -1,91 +1,155 @@
 patterns:
 
   - name: ANTHROPIC_API_KEY
-    regex: 'sk-ant-api\d{2}-[A-Za-z0-9\-_]{20,}'
-    type: apikey
+    type: regex
+    pattern: 'sk-ant-api\d{2}-[A-Za-z0-9\-_]{20,}'
+    category: ai
     confidence: certain
 
   - name: OPENAI_API_KEY
-    regex: 'sk-(proj-)?[A-Za-z0-9\-_]{20,}'
-    type: apikey
-    confidence: certain
-
-  - name: AWS_ACCESS_KEY
-    regex: '\b(?:AKIA|ASIA)[0-9A-Z]{16}\b'
-    type: apikey
-    confidence: certain
-
-  - name: AWS_ACCESS_KEY_ASSIGNMENT
-    regex: '(?i)aws_access_key_id\s*[=:]\s*(?:\\?["''])?(?:AKIA|ASIA)[0-9A-Z]{16}(?:\\?["''])?'
-    type: apikey
-    confidence: certain
-
-  - name: AWS_SECRET_KEY
-    regex: '(?i)aws_secret_access_key\s*[=:]\s*(?:\\?["''])?[A-Za-z0-9/+=]{40}(?:\\?["''])?'
-    type: apikey
-    confidence: certain
-
-  - name: AWS_SESSION_TOKEN
-    regex: '(?i)aws_session_token\s*[=:]\s*(?:\\?["''])?[A-Za-z0-9/+=]{16,}(?:\\?["''])?'
-    type: apikey
+    type: regex
+    pattern: 'sk-(proj-)?[A-Za-z0-9\-_]{20,}'
+    category: ai
     confidence: certain
 
   - name: GOOGLE_API_KEY
-    regex: 'AIza[0-9A-Za-z\-_]{35}'
-    type: apikey
-    confidence: certain
-
-  - name: GITHUB_TOKEN
-    regex: 'gh[ps]_[A-Za-z0-9]{36,}'
-    type: apikey
-    confidence: certain
-
-  - name: GITLAB_TOKEN
-    regex: 'glpat-[A-Za-z0-9\-_]{20}'
-    type: apikey
+    type: regex
+    pattern: 'AIza[0-9A-Za-z\-_]{35}'
+    category: ai
     confidence: certain
 
   - name: HUGGINGFACE_TOKEN
-    regex: 'hf_[A-Za-z0-9]{34,}'
-    type: apikey
+    type: regex
+    pattern: 'hf_[A-Za-z0-9]{34,}'
+    category: ai
     confidence: certain
 
-  - name: STRIPE_KEY
-    regex: 'sk_live_[A-Za-z0-9]{24,}'
-    type: apikey
+  - name: GITHUB_TOKEN
+    type: regex
+    pattern: '(?:gh[opsu]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{20,})'
+    category: dev
+    confidence: certain
+
+  - name: GITLAB_TOKEN
+    type: regex
+    pattern: 'glpat-[A-Za-z0-9\-_]{20,}'
+    category: dev
+    confidence: certain
+
+  - name: NPM_TOKEN
+    type: regex
+    pattern: 'npm_[A-Za-z0-9]{36,}'
+    category: dev
+    confidence: certain
+
+  - name: STRIPE_SECRET_KEY
+    type: regex
+    pattern: 'sk_(?:live|test)_[A-Za-z0-9]{16,}'
+    category: api
     confidence: certain
 
   - name: SENDGRID_KEY
-    regex: 'SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}'
-    type: apikey
+    type: regex
+    pattern: 'SG\.[A-Za-z0-9\-_]{22}\.[A-Za-z0-9\-_]{43}'
+    category: api
     confidence: certain
+
+  - name: SLACK_BOT_TOKEN
+    type: regex
+    pattern: 'xox[baprs]-[A-Za-z0-9-]{10,}'
+    category: api
+    confidence: high
+
+  - name: SLACK_WEBHOOK
+    type: regex
+    pattern: 'https://hooks\.slack\.com/services/[A-Za-z0-9/_-]{20,}'
+    category: api
+    confidence: certain
+
+  - name: AWS_ACCESS_KEY
+    type: regex
+    pattern: '\b(?:AKIA|ASIA)[0-9A-Z]{16}\b'
+    category: cloud
+    confidence: certain
+
+  - name: AWS_ACCESS_KEY_ASSIGNMENT
+    type: regex
+    pattern: '(?i)aws_access_key_id\s*[=:]\s*(?:\\?["''])?(?:AKIA|ASIA)[0-9A-Z]{16}(?:\\?["''])?'
+    category: cloud
+    confidence: certain
+
+  - name: AWS_SECRET_KEY
+    type: regex
+    pattern: '(?i)aws_secret_access_key\s*[=:]\s*(?:\\?["''])?[A-Za-z0-9/+=]{40}(?:\\?["''])?'
+    category: cloud
+    confidence: certain
+
+  - name: AWS_SESSION_TOKEN
+    type: regex
+    pattern: '(?i)aws_session_token\s*[=:]\s*(?:\\?["''])?[A-Za-z0-9/+=]{16,}(?:\\?["''])?'
+    category: cloud
+    confidence: certain
+
+  - name: CLOUDFLARE_TOKEN_ASSIGNMENT
+    type: regex
+    pattern: '(?i)(cloudflare(_api)?_token|cf_api_token)\s*[=:]\s*(?:\\?["''])?[A-Za-z0-9\-_]{20,}(?:\\?["''])?'
+    category: cloud
+    confidence: high
 
   - name: JWT_TOKEN
-    regex: 'eyJ[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+'
-    type: jwt
+    type: regex
+    pattern: 'eyJ[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+'
+    category: auth
     confidence: certain
 
-  - name: PRIVATE_KEY_BLOCK
-    regex: '(?s)-----BEGIN (RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----.*?-----END (RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----'
-    type: cert
-    confidence: certain
-
-  - name: PRIVATE_KEY_HEADER
-    regex: '-----BEGIN (RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----'
-    type: cert
-    confidence: certain
+  - name: BEARER_TOKEN_ASSIGNMENT
+    type: regex
+    pattern: '(?i)\b(?:bearer|access_token|refresh_token|id_token|auth_token)\b\s*[=:]\s*(?:\\?["''])?[A-Za-z0-9\-_./+=]{12,}(?:\\?["''])?'
+    category: auth
+    confidence: high
 
   - name: GENERIC_CONNECTION_STRING
-    regex: '(postgres|postgresql|mysql|mariadb|mongodb|redis|amqp|rabbitmq|kafka)://[^\s"''\\]{8,}'
-    type: connstr
+    type: regex
+    pattern: '(?:postgres|postgresql|mysql|mariadb|mongodb(?:\+srv)?|redis|amqp|rabbitmq|kafka)://[^\s"''\\]{8,}'
+    category: connstr
     confidence: certain
 
   - name: ENV_SECRET_ASSIGNMENT
-    regex: '(?i)(password|passwd|secret|api_key|apikey|access_token|auth_token|private_key)\s*[=:]\s*[^\s"''\n]{6,}'
-    type: password
+    type: regex
+    pattern: '(?i)(password|passwd|secret|api_key|apikey|access_token|auth_token|private_key|client_secret)\s*[=:]\s*(?:\\?"[^\\"\n]{6,}\\?"|[^\s"''\\]{6,})'
+    category: env
     confidence: high
 
   - name: DOTENV_ASSIGNMENT
-    regex: '^[A-Z_]{3,}_(KEY|SECRET|TOKEN|PASSWORD|PASS|PWD|CREDENTIAL)\s*=\s*.{6,}'
-    type: password
+    type: regex
+    pattern: '(?m)^[A-Z_]{3,}_(KEY|SECRET|TOKEN|PASSWORD|PASS|PWD|CREDENTIAL|PRIVATE_KEY)\s*=\s*[^\n\\]{6,}'
+    category: env
     confidence: high
+
+  - name: OPENSSH_PRIVATE_KEY
+    type: contains_between
+    block_start: '-----BEGIN OPENSSH PRIVATE KEY-----'
+    block_end: '-----END OPENSSH PRIVATE KEY-----'
+    category: key
+    confidence: certain
+
+  - name: RSA_PRIVATE_KEY
+    type: contains_between
+    block_start: '-----BEGIN RSA PRIVATE KEY-----'
+    block_end: '-----END RSA PRIVATE KEY-----'
+    category: key
+    confidence: certain
+
+  - name: EC_PRIVATE_KEY
+    type: contains_between
+    block_start: '-----BEGIN EC PRIVATE KEY-----'
+    block_end: '-----END EC PRIVATE KEY-----'
+    category: key
+    confidence: certain
+
+  - name: PKCS8_PRIVATE_KEY
+    type: contains_between
+    block_start: '-----BEGIN PRIVATE KEY-----'
+    block_end: '-----END PRIVATE KEY-----'
+    category: key
+    confidence: certain

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentProxy Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'SF Mono', 'Fira Code', monospace; background: #0d1117; color: #e6edf3; font-size: 13px; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px; border-bottom: 1px solid #21262d; background: #161b22;
+  }
+  header h1 { font-size: 14px; font-weight: 600; letter-spacing: 0.02em; }
+  .status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8b949e; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 6px #3fb950; }
+  .dot.offline { background: #f85149; box-shadow: 0 0 6px #f85149; }
+
+  .summary {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    border-bottom: 1px solid #21262d; background: #21262d;
+  }
+  .card { background: #161b22; padding: 16px 20px; }
+  .card-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .card-value { font-size: 28px; font-weight: 700; color: #e6edf3; }
+  .card-value.highlight { color: #f0883e; }
+
+  .patterns-section {
+    padding: 14px 20px; border-bottom: 1px solid #21262d;
+  }
+  .section-title { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .pattern-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .pattern-name { width: 220px; color: #79c0ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-wrap { flex: 1; height: 6px; background: #21262d; border-radius: 3px; overflow: hidden; }
+  .bar { height: 100%; background: #f0883e; border-radius: 3px; transition: width 0.3s; }
+  .pattern-count { width: 30px; text-align: right; color: #8b949e; }
+  .no-patterns { color: #8b949e; font-style: italic; }
+
+  .logs-section { padding: 14px 20px; }
+  .logs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .log-controls { display: flex; gap: 8px; align-items: center; }
+  .log-controls label { color: #8b949e; font-size: 11px; }
+  .log-controls input[type=checkbox] { cursor: pointer; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left; padding: 6px 10px; font-size: 11px;
+    color: #8b949e; text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid #21262d; position: sticky; top: 0; background: #0d1117;
+  }
+  tbody tr { border-bottom: 1px solid #161b22; transition: background 0.1s; }
+  tbody tr:hover { background: #161b22; }
+  tbody tr.masked { background: #1f1a0e; }
+  tbody tr.masked:hover { background: #252010; }
+  tbody tr.expandable { cursor: pointer; }
+  tbody tr.detail-row { display: none; background: #0d1117; }
+  tbody tr.detail-row.open { display: table-row; }
+  td { padding: 6px 10px; vertical-align: middle; }
+  .ts { color: #6e7681; white-space: nowrap; }
+  .method { font-weight: 600; }
+  .method.POST { color: #3fb950; }
+  .method.GET { color: #79c0ff; }
+  .host { color: #e6edf3; }
+  .path { color: #8b949e; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .badge {
+    display: inline-block; padding: 1px 7px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge.clean { background: #161b22; color: #6e7681; border: 1px solid #30363d; }
+  .badge.masked-badge { background: #3d1f00; color: #f0883e; border: 1px solid #7d3a00; }
+  .badge.ws { background: #0d2840; color: #79c0ff; border: 1px solid #1c4a7a; }
+  .patterns-inline { color: #8b949e; font-size: 11px; }
+  .event-type { color: #6e7681; font-size: 11px; }
+  .body-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 10px 0; }
+  .body-grid.four { grid-template-rows: auto auto; }
+  .body-panel { border: 1px solid #21262d; background: #010409; }
+  .body-title { padding: 7px 9px; color: #8b949e; border-bottom: 1px solid #21262d; text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; display: flex; justify-content: space-between; }
+  .body-title .pane-label { color: #8b949e; }
+  .body-title.req .pane-label { color: #79c0ff; }
+  .body-title.resp .pane-label { color: #3fb950; }
+  .body-title .modified-flag { color: #f0883e; font-weight: 600; }
+  .body-panel pre { max-height: 240px; overflow: auto; padding: 9px; white-space: pre-wrap; overflow-wrap: anywhere; color: #c9d1d9; font-family: inherit; font-size: 12px; }
+  .body-panel pre mark { background: #3d1f00; color: #f0883e; padding: 0 2px; border-radius: 2px; }
+  .body-disabled { color: #6e7681; font-style: italic; }
+  .replacements { padding: 10px 0; }
+  .replacements-title { color: #8b949e; text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; padding: 7px 9px; border-bottom: 1px solid #21262d; }
+  .replacements-table { width: 100%; }
+  .replacements-table th { text-align: left; padding: 4px 9px; font-size: 10px; color: #6e7681; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #21262d; }
+  .replacements-table td { padding: 4px 9px; font-size: 11px; }
+  .replacements-table .pattern { color: #79c0ff; }
+  .replacements-table .surrogate { color: #f0883e; font-family: 'SF Mono', monospace; }
+  .replacements-table .original { color: #3fb950; font-family: 'SF Mono', monospace; }
+  .privacy-note { padding: 8px 9px; color: #6e7681; font-size: 11px; font-style: italic; border-top: 1px solid #21262d; }
+
+  .no-data { text-align: center; padding: 40px; color: #6e7681; }
+
+  #log-scroll { max-height: calc(100vh - 340px); overflow-y: auto; }
+
+  .footer { padding: 8px 20px; border-top: 1px solid #21262d; color: #6e7681; font-size: 11px; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AgentProxy</h1>
+  <div class="status">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">connecting…</span>
+  </div>
+</header>
+
+<div class="summary">
+  <div class="card">
+    <div class="card-label">Total Requests</div>
+    <div class="card-value" id="m-total">—</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Secrets Caught</div>
+    <div class="card-value highlight" id="m-caught">—</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Sessions</div>
+    <div class="card-value" id="m-sessions">—</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Top Pattern</div>
+    <div class="card-value" id="m-top" style="font-size:13px;padding-top:6px">—</div>
+  </div>
+</div>
+
+<div class="patterns-section">
+  <div class="section-title">Patterns Triggered</div>
+  <div id="patterns-list"><span class="no-patterns">No secrets caught yet</span></div>
+</div>
+
+<div class="logs-section">
+  <div class="logs-header">
+    <div class="section-title">Live Log</div>
+    <div class="log-controls">
+      <label><input type="checkbox" id="show-clean" checked> show clean</label>
+      <label><input type="checkbox" id="show-passthrough"> show passthrough</label>
+      <label><input type="checkbox" id="modified-only"> modified only</label>
+      <label><input type="checkbox" id="auto-scroll" checked> auto-scroll</label>
+    </div>
+  </div>
+  <div id="log-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:90px">Time</th>
+          <th style="width:60px">Type</th>
+          <th style="width:55px">Method</th>
+          <th>Host</th>
+          <th>Path</th>
+          <th style="width:110px">Status</th>
+          <th>Patterns</th>
+        </tr>
+      </thead>
+      <tbody id="log-body">
+        <tr><td colspan="7" class="no-data">Waiting for traffic…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  <span>AgentProxy Dashboard</span>
+  <span id="last-updated">—</span>
+</div>
+
+<script>
+const MAX_ROWS = 500;
+let rows = [];
+let connected = false;
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+// ── Metrics polling ────────────────────────────────────────────────────────
+function fetchMetrics() {
+  fetch('/api/metrics')
+    .then(r => r.json())
+    .then(m => {
+      document.getElementById('m-total').textContent = m.total_requests ?? 0;
+      document.getElementById('m-caught').textContent = m.secrets_caught ?? 0;
+      document.getElementById('m-sessions').textContent = m.sessions ?? 0;
+      document.getElementById('last-updated').textContent = m.last_updated
+        ? 'updated ' + new Date(m.last_updated).toLocaleTimeString()
+        : '';
+
+      // Top pattern
+      const byPattern = m.by_pattern || {};
+      const entries = Object.entries(byPattern).sort((a,b) => b[1]-a[1]);
+      document.getElementById('m-top').textContent = entries.length > 0 ? entries[0][0] : '—';
+
+      // Patterns bar chart
+      const container = document.getElementById('patterns-list');
+      if (entries.length === 0) {
+        container.innerHTML = '<span class="no-patterns">No secrets caught yet</span>';
+      } else {
+        const max = entries[0][1];
+        container.innerHTML = entries.map(([name, count]) => `
+          <div class="pattern-row">
+            <div class="pattern-name" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
+            <div class="bar-wrap"><div class="bar" style="width:${Math.round(count/max*100)}%"></div></div>
+            <div class="pattern-count">${count}</div>
+          </div>`).join('');
+      }
+    })
+    .catch(() => {});
+}
+fetchMetrics();
+setInterval(fetchMetrics, 5000);
+
+// ── SSE log stream ─────────────────────────────────────────────────────────
+function connect() {
+  const es = new EventSource('/api/logs/stream');
+  es.onopen = () => {
+    connected = true;
+    document.getElementById('status-dot').className = 'dot';
+    document.getElementById('status-text').textContent = 'live';
+  };
+  es.onmessage = e => {
+    try { appendRow(JSON.parse(e.data)); } catch(_) {}
+  };
+  es.onerror = () => {
+    connected = false;
+    document.getElementById('status-dot').className = 'dot offline';
+    document.getElementById('status-text').textContent = 'reconnecting…';
+    es.close();
+    setTimeout(connect, 3000);
+  };
+}
+connect();
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function appendRow(entry) {
+  const showClean = document.getElementById('show-clean').checked;
+  const showPassthrough = document.getElementById('show-passthrough').checked;
+
+  const modifiedOnly = document.getElementById('modified-only').checked;
+  if (entry.event === 'passthrough' && !showPassthrough) return;
+  if ((entry.event === 'request' || entry.event === 'response' || entry.event === 'websocket') && entry.masked_count === 0 && !showClean) return;
+  if (modifiedOnly && (entry.masked_count || 0) === 0) return;
+
+  const tbody = document.getElementById('log-body');
+  // Clear "waiting" placeholder
+  const placeholder = tbody.querySelector('[colspan]');
+  if (placeholder) placeholder.parentElement.remove();
+
+  const ts = entry.ts ? new Date(entry.ts).toLocaleTimeString() : '';
+  const masked = (entry.masked_count || 0) > 0;
+  const eventLabel = entry.event === 'websocket' ? 'ws' : entry.event;
+
+  const tr = document.createElement('tr');
+  tr.className = masked ? 'masked expandable' : 'expandable';
+
+  const patterns = (entry.patterns || []).join(', ');
+  const badge = masked
+    ? `<span class="badge masked-badge">▲ ${entry.masked_count} masked</span>`
+    : entry.event === 'websocket'
+    ? `<span class="badge ws">ws</span>`
+    : `<span class="badge clean">clean</span>`;
+
+  tr.innerHTML = `
+    <td class="ts">${escapeHtml(ts)}</td>
+    <td class="event-type">${escapeHtml(eventLabel)}</td>
+    <td class="method ${escapeHtml(entry.method || '')}">${escapeHtml(entry.method || '—')}</td>
+    <td class="host">${escapeHtml(entry.host || '')}</td>
+    <td class="path" title="${escapeHtml(entry.path || '')}">${escapeHtml(entry.path || '')}</td>
+    <td>${badge}</td>
+    <td class="patterns-inline">${escapeHtml(patterns)}</td>`;
+
+  const detail = document.createElement('tr');
+  detail.className = 'detail-row';
+  // Initial render: show whatever the SSE entry brought (legacy 2-pane).
+  // On expand we ALSO fetch /api/traffic/{id} (if present) to populate the
+  // 4-pane view with originals + replacements. This is the dashboard's
+  // killer view — don't fetch eagerly on every row.
+  const bodyFields = bodyPanels(entry);
+  detail.innerHTML = `<td colspan="7"><div class="body-grid">${bodyFields}</div><div class="detail-async"></div></td>`;
+  tr.addEventListener('click', () => {
+    detail.classList.toggle('open');
+    if (detail.classList.contains('open') && entry.id && !detail.dataset.fetched) {
+      detail.dataset.fetched = '1';
+      loadDetail(entry.id, detail.querySelector('.detail-async'));
+    }
+  });
+
+  tbody.insertBefore(tr, tbody.firstChild);
+  tbody.insertBefore(detail, tr.nextSibling);
+  rows.push({ tr, detail });
+  if (rows.length > MAX_ROWS) {
+    const old = rows.shift();
+    old.tr.remove();
+    old.detail.remove();
+  }
+
+  if (document.getElementById('auto-scroll').checked) {
+    const scroll = document.getElementById('log-scroll');
+    scroll.scrollTop = 0;
+  }
+}
+
+function bodyPanels(entry) {
+  const panels = [];
+  if (entry.event === 'request' || (entry.event === 'websocket' && entry.direction === 'client->server')) {
+    panels.push(bodyPanel('Request', entry.request_body, 'disabled by logging.log_originals=false'));
+    panels.push(bodyPanel('Modified Request', entry.modified_request_body || entry.body, 'not captured'));
+  } else if (entry.event === 'response' || (entry.event === 'websocket' && entry.direction === 'server->client')) {
+    panels.push(bodyPanel('Response', entry.response_body, 'disabled by logging.log_originals=false'));
+    panels.push(bodyPanel('Modified Response', entry.modified_response_body || entry.body, 'not captured'));
+  } else {
+    panels.push(bodyPanel('Body', entry.body, 'not captured'));
+  }
+  return panels.join('');
+}
+
+function bodyPanel(title, body, emptyText) {
+  const hasBody = body !== undefined && body !== null && body !== '';
+  const content = hasBody
+    ? escapeHtml(body)
+    : `<span class="body-disabled">${escapeHtml(emptyText)}</span>`;
+  return `<div class="body-panel"><div class="body-title">${escapeHtml(title)}</div><pre>${content}</pre></div>`;
+}
+
+// loadDetail fetches the full MaskingEvent from /api/traffic/{id} (in-memory
+// store; originals retained for ~10 min) and renders the 4-pane view +
+// replacements panel. If the event has expired or originals were never
+// captured for this id, falls back to a friendly note.
+function loadDetail(id, container) {
+  fetch('/api/traffic/' + encodeURIComponent(id))
+    .then(r => {
+      if (!r.ok) throw new Error('not found');
+      return r.json();
+    })
+    .then(ev => {
+      container.innerHTML = renderFourPane(ev) + renderReplacements(ev.replacements);
+      // After insertion, highlight surrogates/originals in the panes.
+      highlightDifferences(container, ev);
+    })
+    .catch(() => {
+      container.innerHTML = '<div class="privacy-note">Originals expired or not available for this request — they live in memory only and clear after ~10 minutes for privacy.</div>';
+    });
+}
+
+function renderFourPane(ev) {
+  const reqHasMask = ev.original_request && ev.masked_request && ev.original_request !== ev.masked_request;
+  const respHasMask = ev.original_response && ev.restored_response && ev.original_response !== ev.restored_response;
+  return `
+    <div class="body-grid four">
+      <div class="body-panel">
+        <div class="body-title req">
+          <span class="pane-label">Original Request (in-memory only)</span>
+          ${reqHasMask ? '<span class="modified-flag">▲ modified</span>' : ''}
+        </div>
+        <pre>${escapeHtml(ev.original_request || '(empty)')}</pre>
+      </div>
+      <div class="body-panel">
+        <div class="body-title req">
+          <span class="pane-label">Masked Request → upstream</span>
+        </div>
+        <pre>${escapeHtml(ev.masked_request || '(empty)')}</pre>
+      </div>
+      <div class="body-panel">
+        <div class="body-title resp">
+          <span class="pane-label">Upstream Response (raw)</span>
+        </div>
+        <pre>${escapeHtml(ev.original_response || '(empty)')}</pre>
+      </div>
+      <div class="body-panel">
+        <div class="body-title resp">
+          <span class="pane-label">Restored Response → agent</span>
+          ${respHasMask ? '<span class="modified-flag">▲ restored</span>' : ''}
+        </div>
+        <pre>${escapeHtml(ev.restored_response || '(empty)')}</pre>
+      </div>
+    </div>
+    <div class="privacy-note">Originals are kept in memory only and clear after ~10 minutes. They are never written to disk.</div>
+  `;
+}
+
+function renderReplacements(reps) {
+  if (!reps || reps.length === 0) return '';
+  const rows = reps.map(r => `
+    <tr>
+      <td class="pattern">${escapeHtml(r.pattern || '')}</td>
+      <td class="surrogate" title="${escapeHtml(r.surrogate || '')}">${escapeHtml(truncate(r.surrogate, 32))}</td>
+      <td class="original" title="(truncated for privacy)">${escapeHtml(truncateMid(r.original, 16))}</td>
+    </tr>`).join('');
+  return `
+    <div class="replacements">
+      <div class="replacements-title">Replacements (${reps.length})</div>
+      <table class="replacements-table">
+        <thead><tr><th>Pattern</th><th>Surrogate</th><th>Original (truncated)</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function truncate(s, n) {
+  s = s || '';
+  return s.length <= n ? s : s.slice(0, n) + '…';
+}
+
+// truncateMid keeps the first 4 and last 4 chars so users can recognise the
+// original at a glance without the full secret being on screen.
+function truncateMid(s, total) {
+  s = s || '';
+  if (s.length <= total) return s;
+  return s.slice(0, 4) + '…' + s.slice(-4);
+}
+
+// highlightDifferences wraps any surrogate token (still present in masked req
+// or upstream resp) with <mark> so the eye can find it instantly.
+function highlightDifferences(container, ev) {
+  if (!ev.replacements) return;
+  const panes = container.querySelectorAll('.body-panel pre');
+  for (const pane of panes) {
+    let html = pane.innerHTML;
+    for (const r of ev.replacements) {
+      if (!r.surrogate) continue;
+      const escaped = escapeHtml(r.surrogate).replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      html = html.replaceAll(new RegExp(escaped, 'g'), '<mark>' + escapeHtml(r.surrogate) + '</mark>');
+    }
+    pane.innerHTML = html;
+  }
+}
+
+// Re-apply filter when toggles change
+['show-clean','show-passthrough'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    // Just let new events obey the filter; existing rows stay (UX simplicity)
+  });
+});
+</script>
+</body>
+</html>

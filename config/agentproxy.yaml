@@ -15,7 +15,11 @@ detection:
     - api.githubcopilot.com
     - api.individual.githubcopilot.com
     - copilot-proxy.githubusercontent.com
-    - api.github.com
+    # api.github.com is intentionally NOT intercepted: it is the bare GitHub
+    # REST API used by `gh repo view`, `gh pr create`, etc. Intercepting it
+    # MITMs every regular `gh` command run via copilotproxy and risks
+    # breaking unrelated GitHub workflows. Copilot's chat/completion
+    # traffic uses the *.githubcopilot.com hosts above, which is enough.
   # Add any domain here to intercept its traffic and mask secrets.
   # Examples:
   #   - localhost:4000      # LiteLLM or other local gateway
@@ -33,9 +37,9 @@ pii:
     - ip_address
 
 masking:
-  show_prefix_chars: 4
-  show_suffix_chars: 4
-  star_length: 24
+  show_prefix_chars: 4    # legacy; surrogates now preserve shape instead of star masks
+  show_suffix_chars: 4    # legacy; retained for config compatibility
+  star_length: 24         # legacy; retained for config compatibility
 
 logging:
   log_file: ./logs/traffic.jsonl

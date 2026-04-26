@@ -6,7 +6,7 @@ patterns:
     confidence: high
 
   - name: PHONE_NUMBER
-    regex: '(?<!\w)(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}(?!\w)'
+    regex: '(^|[^[:alnum:]_])(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}([^[:alnum:]_]|$)'
     type: pii_phone
     confidence: medium
 
