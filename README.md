@@ -390,6 +390,13 @@ All secret-detection patterns live in `config/patterns.yaml` — contributions f
 
 ---
 
+## Acknowledgements
+
+- **[Gitleaks](https://github.com/gitleaks/gitleaks)** — the default secret-detection rules in `config/patterns.yaml` are bulk-imported from the Gitleaks community catalog (MIT). Each imported rule carries a `# source:` comment.
+- **[elazarl/goproxy](https://github.com/elazarl/goproxy)** — MITM proxy engine; vendored fork with WebSocket support lives in `third_party/goproxywss`.
+
+---
+
 ## License
 
 MIT License — see [LICENSE](LICENSE).

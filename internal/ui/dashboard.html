@@ -151,6 +151,7 @@
           <th style="width:90px">Time</th>
           <th style="width:60px">Type</th>
           <th style="width:55px">Method</th>
+          <th style="width:110px">Provider</th>
           <th>Host</th>
           <th>Path</th>
           <th style="width:110px">Status</th>
@@ -158,7 +159,7 @@
         </tr>
       </thead>
       <tbody id="log-body">
-        <tr><td colspan="7" class="no-data">Waiting for traffic…</td></tr>
+        <tr><td colspan="8" class="no-data">Waiting for traffic…</td></tr>
       </tbody>
     </table>
   </div>
@@ -240,16 +241,46 @@ function connect() {
 }
 connect();
 
-// ── Render ─────────────────────────────────────────────────────────────────
-function appendRow(entry) {
+// ── Provider classifier ───────────────────────────────────────────────────
+// Maps an intercepted host → friendly provider label. Add new mappings as
+// new intercepted_domains are added in agentproxy.yaml.
+function providerOf(host) {
+  if (!host) return '—';
+  host = host.toLowerCase();
+  if (host.endsWith('anthropic.com')) return 'Anthropic';
+  if (host === 'api.openai.com') return 'OpenAI';
+  if (host === 'chatgpt.com' || host.endsWith('.chatgpt.com')) return 'OpenAI Codex';
+  if (host.endsWith('githubcopilot.com') || host.endsWith('copilot-proxy.githubusercontent.com')) return 'GitHub Copilot';
+  return '—';
+}
+
+// ── Filter ─────────────────────────────────────────────────────────────────
+// Applies the current checkbox state to ALL rendered rows (not just incoming).
+// Each row stashes its event metadata in dataset so we don't need to keep
+// the original entry around.
+function rowVisible(meta) {
   const showClean = document.getElementById('show-clean').checked;
   const showPassthrough = document.getElementById('show-passthrough').checked;
-
   const modifiedOnly = document.getElementById('modified-only').checked;
-  if (entry.event === 'passthrough' && !showPassthrough) return;
-  if ((entry.event === 'request' || entry.event === 'response' || entry.event === 'websocket') && entry.masked_count === 0 && !showClean) return;
-  if (modifiedOnly && (entry.masked_count || 0) === 0) return;
+  const masked = parseInt(meta.maskedCount || '0', 10) > 0;
+  if (meta.event === 'passthrough') return showPassthrough;
+  if (modifiedOnly && !masked) return false;
+  if (!masked && !showClean) return false;
+  return true;
+}
+function applyFilters() {
+  for (const r of rows) {
+    const ok = rowVisible(r.tr.dataset);
+    r.tr.style.display = ok ? '' : 'none';
+    if (!ok && r.detail.classList.contains('open')) {
+      r.detail.classList.remove('open');
+    }
+    r.detail.style.display = ok ? '' : 'none';
+  }
+}
 
+// ── Render ─────────────────────────────────────────────────────────────────
+function appendRow(entry) {
   const tbody = document.getElementById('log-body');
   // Clear "waiting" placeholder
   const placeholder = tbody.querySelector('[colspan]');
@@ -261,8 +292,11 @@ function appendRow(entry) {
 
   const tr = document.createElement('tr');
   tr.className = masked ? 'masked expandable' : 'expandable';
+  tr.dataset.event = entry.event || '';
+  tr.dataset.maskedCount = String(entry.masked_count || 0);
 
   const patterns = (entry.patterns || []).join(', ');
+  const provider = providerOf(entry.host);
   const badge = masked
     ? `<span class="badge masked-badge">▲ ${entry.masked_count} masked</span>`
     : entry.event === 'websocket'
@@ -273,6 +307,7 @@ function appendRow(entry) {
     <td class="ts">${escapeHtml(ts)}</td>
     <td class="event-type">${escapeHtml(eventLabel)}</td>
     <td class="method ${escapeHtml(entry.method || '')}">${escapeHtml(entry.method || '—')}</td>
+    <td class="provider">${escapeHtml(provider)}</td>
     <td class="host">${escapeHtml(entry.host || '')}</td>
     <td class="path" title="${escapeHtml(entry.path || '')}">${escapeHtml(entry.path || '')}</td>
     <td>${badge}</td>
@@ -285,7 +320,7 @@ function appendRow(entry) {
   // 4-pane view with originals + replacements. This is the dashboard's
   // killer view — don't fetch eagerly on every row.
   const bodyFields = bodyPanels(entry);
-  detail.innerHTML = `<td colspan="7"><div class="body-grid">${bodyFields}</div><div class="detail-async"></div></td>`;
+  detail.innerHTML = `<td colspan="8"><div class="body-grid">${bodyFields}</div><div class="detail-async"></div></td>`;
   tr.addEventListener('click', () => {
     detail.classList.toggle('open');
     if (detail.classList.contains('open') && entry.id && !detail.dataset.fetched) {
@@ -301,6 +336,12 @@ function appendRow(entry) {
     const old = rows.shift();
     old.tr.remove();
     old.detail.remove();
+  }
+
+  // Apply current filter state to the newly-inserted row.
+  if (!rowVisible(tr.dataset)) {
+    tr.style.display = 'none';
+    detail.style.display = 'none';
   }
 
   if (document.getElementById('auto-scroll').checked) {
@@ -434,11 +475,9 @@ function highlightDifferences(container, ev) {
   }
 }
 
-// Re-apply filter when toggles change
-['show-clean','show-passthrough'].forEach(id => {
-  document.getElementById(id).addEventListener('change', () => {
-    // Just let new events obey the filter; existing rows stay (UX simplicity)
-  });
+// Re-apply filter when toggles change — affects existing rows AND new ones.
+['show-clean','show-passthrough','modified-only'].forEach(id => {
+  document.getElementById(id).addEventListener('change', applyFilters);
 });
 </script>
 </body>

@@ -1,3 +1,14 @@
+# Secret-detection patterns for AgentProxy.
+#
+# Bulk-imported from gitleaks (https://github.com/gitleaks/gitleaks) -- MIT licensed.
+# Last synced: 2026-05-11
+# AgentProxy-specific assignment-style rules (those whose name ends in _ASSIGNMENT
+# and JWT_TOKEN / GENERIC_CONNECTION_STRING) are local additions, not from gitleaks.
+# Where AgentProxy and gitleaks both ship a rule for the same vendor
+# (anthropic, openai, github, stripe, etc.), the AgentProxy version is kept
+# because the existing test fixtures are tuned to it; the gitleaks rule id
+# is listed in the alias map of the import tooling and skipped on re-sync.
+
 patterns:
 
   - name: ANTHROPIC_API_KEY
@@ -152,4 +163,1397 @@ patterns:
     block_start: '-----BEGIN PRIVATE KEY-----'
     block_end: '-----END PRIVATE KEY-----'
     category: key
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "1password-secret-key"
+  - name: 1PASSWORD_SECRET_KEY
+    type: regex
+    pattern: '\bA3-[A-Z0-9]{6}-(?:(?:[A-Z0-9]{11})|(?:[A-Z0-9]{6}-[A-Z0-9]{5}))-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}\b'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "1password-service-account-token"
+  - name: 1PASSWORD_SERVICE_ACCOUNT_TOKEN
+    type: regex
+    pattern: 'ops_eyJ[a-zA-Z0-9+/]{250,}={0,3}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "adafruit-api-key"
+  - name: ADAFRUIT_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:adafruit)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9_-]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "adobe-client-id"
+  - name: ADOBE_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:adobe)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "adobe-client-secret"
+  - name: ADOBE_CLIENT_SECRET
+    type: regex
+    pattern: '\b(p8e-(?i)[a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "age-secret-key"
+  - name: AGE_SECRET_KEY
+    type: regex
+    pattern: 'AGE-SECRET-KEY-1[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{58}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "airtable-api-key"
+  - name: AIRTABLE_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:airtable)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{17})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "airtable-personnal-access-token"
+  - name: AIRTABLE_PERSONNAL_ACCESS_TOKEN
+    type: regex
+    pattern: '\b(pat[[:alnum:]]{14}\.[a-f0-9]{64})\b'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "algolia-api-key"
+  - name: ALGOLIA_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:algolia)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "alibaba-access-key-id"
+  - name: ALIBABA_ACCESS_KEY_ID
+    type: regex
+    pattern: '\b(LTAI(?i)[a-z0-9]{20})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "alibaba-secret-key"
+  - name: ALIBABA_SECRET_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:alibaba)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{30})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "anthropic-admin-api-key"
+  - name: ANTHROPIC_ADMIN_API_KEY
+    type: regex
+    pattern: '\b(sk-ant-admin01-[a-zA-Z0-9_\-]{93}AA)(?:[\x60''"\s;]|\\[nr]|$)'
+    category: ai
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "artifactory-api-key"
+  - name: ARTIFACTORY_API_KEY
+    type: regex
+    pattern: '\bAKCp[A-Za-z0-9]{69}\b'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "artifactory-reference-token"
+  - name: ARTIFACTORY_REFERENCE_TOKEN
+    type: regex
+    pattern: '\bcmVmd[A-Za-z0-9]{59}\b'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "asana-client-id"
+  - name: ASANA_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:asana)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9]{16})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "asana-client-secret"
+  - name: ASANA_CLIENT_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:asana)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "atlassian-api-token"
+  - name: ATLASSIAN_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:(?-i:ATLASSIAN|[Aa]tlassian)|(?-i:CONFLUENCE|[Cc]onfluence)|(?-i:JIRA|[Jj]ira))(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{20}[a-f0-9]{4})(?:[\x60''"\s;]|\\[nr]|$)|\b(ATATT3[A-Za-z0-9_\-=]{186})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "authress-service-client-access-key"
+  - name: AUTHRESS_SERVICE_CLIENT_ACCESS_KEY
+    type: regex
+    pattern: '\b((?:sc|ext|scauth|authress)_(?i)[a-z0-9]{5,30}\.[a-z0-9]{4,6}\.(?-i:acc)[_-][a-z0-9-]{10,32}\.[a-z0-9+/_=-]{30,120})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "aws-amazon-bedrock-api-key-long-lived"
+  - name: AWS_AMAZON_BEDROCK_API_KEY_LONG_LIVED
+    type: regex
+    pattern: '\b(ABSK[A-Za-z0-9+/]{109,269}={0,2})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "aws-amazon-bedrock-api-key-short-lived"
+  - name: AWS_AMAZON_BEDROCK_API_KEY_SHORT_LIVED
+    type: regex
+    pattern: 'bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29t'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "azure-ad-client-secret"
+  - name: AZURE_AD_CLIENT_SECRET
+    type: regex
+    pattern: '(?:^|[\\''"\x60\s>=:(,)])([a-zA-Z0-9_~.]{3}\dQ~[a-zA-Z0-9_~.-]{31,34})(?:$|[\\''"\x60\s<),])'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "beamer-api-token"
+  - name: BEAMER_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:beamer)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(b_[a-z0-9=_\-]{44})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "bitbucket-client-id"
+  - name: BITBUCKET_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:bitbucket)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "bitbucket-client-secret"
+  - name: BITBUCKET_CLIENT_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:bitbucket)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "bittrex-access-key"
+  - name: BITTREX_ACCESS_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:bittrex)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "bittrex-secret-key"
+  - name: BITTREX_SECRET_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:bittrex)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "cisco-meraki-api-key"
+  - name: CISCO_MERAKI_API_KEY
+    type: regex
+    pattern: '[\w.-]{0,50}?(?i:[\w.-]{0,50}?(?:(?-i:[Mm]eraki|MERAKI))(?:[ \t\w.-]{0,20})[\s''"]{0,3})(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9a-f]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "clickhouse-cloud-api-secret-key"
+  - name: CLICKHOUSE_CLOUD_API_SECRET_KEY
+    type: regex
+    pattern: '\b(4b1d[A-Za-z0-9]{38})\b'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "clojars-api-token"
+  - name: CLOJARS_API_TOKEN
+    type: regex
+    pattern: '(?i)CLOJARS_[a-z0-9]{60}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "cloudflare-api-key"
+  - name: CLOUDFLARE_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:cloudflare)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9_-]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "cloudflare-global-api-key"
+  - name: CLOUDFLARE_GLOBAL_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:cloudflare)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{37})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "cloudflare-origin-ca-key"
+  - name: CLOUDFLARE_ORIGIN_CA_KEY
+    type: regex
+    pattern: '\b(v1\.0-[a-f0-9]{24}-[a-f0-9]{146})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "codecov-access-token"
+  - name: CODECOV_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:codecov)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "cohere-api-token"
+  - name: COHERE_API_TOKEN
+    type: regex
+    pattern: '[\w.-]{0,50}?(?i:[\w.-]{0,50}?(?:cohere|CO_API_KEY)(?:[ \t\w.-]{0,20})[\s''"]{0,3})(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-zA-Z0-9]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: ai
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "coinbase-access-token"
+  - name: COINBASE_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:coinbase)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9_-]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "confluent-access-token"
+  - name: CONFLUENT_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:confluent)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{16})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "confluent-secret-key"
+  - name: CONFLUENT_SECRET_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:confluent)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "contentful-delivery-api-token"
+  - name: CONTENTFUL_DELIVERY_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:contentful)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{43})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "databricks-api-token"
+  - name: DATABRICKS_API_TOKEN
+    type: regex
+    pattern: '\b(dapi[a-f0-9]{32}(?:-\d)?)(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "datadog-access-token"
+  - name: DATADOG_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:datadog)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "defined-networking-api-token"
+  - name: DEFINED_NETWORKING_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:dnkey)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(dnkey-[a-z0-9=_\-]{26}-[a-z0-9=_\-]{52})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "digitalocean-access-token"
+  - name: DIGITALOCEAN_ACCESS_TOKEN
+    type: regex
+    pattern: '\b(doo_v1_[a-f0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "digitalocean-pat"
+  - name: DIGITALOCEAN_PAT
+    type: regex
+    pattern: '\b(dop_v1_[a-f0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "digitalocean-refresh-token"
+  - name: DIGITALOCEAN_REFRESH_TOKEN
+    type: regex
+    pattern: '(?i)\b(dor_v1_[a-f0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "discord-api-token"
+  - name: DISCORD_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:discord)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "discord-client-id"
+  - name: DISCORD_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:discord)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9]{18})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "discord-client-secret"
+  - name: DISCORD_CLIENT_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:discord)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "doppler-api-token"
+  - name: DOPPLER_API_TOKEN
+    type: regex
+    pattern: 'dp\.pt\.(?i)[a-z0-9]{43}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "droneci-access-token"
+  - name: DRONECI_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:droneci)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "dropbox-api-token"
+  - name: DROPBOX_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:dropbox)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{15})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "dropbox-long-lived-api-token"
+  - name: DROPBOX_LONG_LIVED_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:dropbox)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{11}(AAAAAAAAAA)[a-z0-9\-_=]{43})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "dropbox-short-lived-api-token"
+  - name: DROPBOX_SHORT_LIVED_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:dropbox)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(sl\.[a-z0-9\-=_]{135})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "duffel-api-token"
+  - name: DUFFEL_API_TOKEN
+    type: regex
+    pattern: 'duffel_(?:test|live)_(?i)[a-z0-9_\-=]{43}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "dynatrace-api-token"
+  - name: DYNATRACE_API_TOKEN
+    type: regex
+    pattern: 'dt0c01\.(?i)[a-z0-9]{24}\.[a-z0-9]{64}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "easypost-api-token"
+  - name: EASYPOST_API_TOKEN
+    type: regex
+    pattern: '\bEZAK(?i)[a-z0-9]{54}\b'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "easypost-test-api-token"
+  - name: EASYPOST_TEST_API_TOKEN
+    type: regex
+    pattern: '\bEZTK(?i)[a-z0-9]{54}\b'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "etsy-access-token"
+  - name: ETSY_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:(?-i:ETSY|[Ee]tsy))(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{24})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "facebook-access-token"
+  - name: FACEBOOK_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)\b(\d{15,16}(\||%)[0-9a-z\-_]{27,40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "facebook-page-access-token"
+  - name: FACEBOOK_PAGE_ACCESS_TOKEN
+    type: regex
+    pattern: '\b(EAA[MC](?i)[a-z0-9]{100,})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "facebook-secret"
+  - name: FACEBOOK_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:facebook)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "fastly-api-token"
+  - name: FASTLY_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:fastly)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "finicity-api-token"
+  - name: FINICITY_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:finicity)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "finicity-client-secret"
+  - name: FINICITY_CLIENT_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:finicity)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{20})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "finnhub-access-token"
+  - name: FINNHUB_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:finnhub)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{20})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "flickr-access-token"
+  - name: FLICKR_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:flickr)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "flutterwave-encryption-key"
+  - name: FLUTTERWAVE_ENCRYPTION_KEY
+    type: regex
+    pattern: 'FLWSECK_TEST-(?i)[a-h0-9]{12}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "flutterwave-public-key"
+  - name: FLUTTERWAVE_PUBLIC_KEY
+    type: regex
+    pattern: 'FLWPUBK_TEST-(?i)[a-h0-9]{32}-X'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "flutterwave-secret-key"
+  - name: FLUTTERWAVE_SECRET_KEY
+    type: regex
+    pattern: 'FLWSECK_TEST-(?i)[a-h0-9]{32}-X'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "flyio-access-token"
+  - name: FLYIO_ACCESS_TOKEN
+    type: regex
+    pattern: '\b((?:fo1_[\w-]{43}|fm1[ar]_[a-zA-Z0-9+\/]{100,}={0,3}|fm2_[a-zA-Z0-9+\/]{100,}={0,3}))(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "frameio-api-token"
+  - name: FRAMEIO_API_TOKEN
+    type: regex
+    pattern: 'fio-u-(?i)[a-z0-9\-_=]{64}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "freemius-secret-key"
+  - name: FREEMIUS_SECRET_KEY
+    type: regex
+    pattern: '(?i)["'']secret_key["'']\s*=>\s*["''](sk_[\S]{29})["'']'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "freshbooks-access-token"
+  - name: FRESHBOOKS_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:freshbooks)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "github-app-token"
+  - name: GITHUB_APP_TOKEN
+    type: regex
+    pattern: '(?:ghu|ghs)_[0-9a-zA-Z]{36}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "github-fine-grained-pat"
+  - name: GITHUB_FINE_GRAINED_PAT
+    type: regex
+    pattern: 'github_pat_\w{82}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "github-oauth"
+  - name: GITHUB_OAUTH
+    type: regex
+    pattern: 'gho_[0-9a-zA-Z]{36}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "github-refresh-token"
+  - name: GITHUB_REFRESH_TOKEN
+    type: regex
+    pattern: 'ghr_[0-9a-zA-Z]{36}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-cicd-job-token"
+  - name: GITLAB_CICD_JOB_TOKEN
+    type: regex
+    pattern: 'glcbt-[0-9a-zA-Z]{1,5}_[0-9a-zA-Z_-]{20}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-deploy-token"
+  - name: GITLAB_DEPLOY_TOKEN
+    type: regex
+    pattern: 'gldt-[0-9a-zA-Z_\-]{20}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-feature-flag-client-token"
+  - name: GITLAB_FEATURE_FLAG_CLIENT_TOKEN
+    type: regex
+    pattern: 'glffct-[0-9a-zA-Z_\-]{20}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-feed-token"
+  - name: GITLAB_FEED_TOKEN
+    type: regex
+    pattern: 'glft-[0-9a-zA-Z_\-]{20}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-incoming-mail-token"
+  - name: GITLAB_INCOMING_MAIL_TOKEN
+    type: regex
+    pattern: 'glimt-[0-9a-zA-Z_\-]{25}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-kubernetes-agent-token"
+  - name: GITLAB_KUBERNETES_AGENT_TOKEN
+    type: regex
+    pattern: 'glagent-[0-9a-zA-Z_\-]{50}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-oauth-app-secret"
+  - name: GITLAB_OAUTH_APP_SECRET
+    type: regex
+    pattern: 'gloas-[0-9a-zA-Z_\-]{64}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-pat-routable"
+  - name: GITLAB_PAT_ROUTABLE
+    type: regex
+    pattern: '\bglpat-[0-9a-zA-Z_-]{27,300}\.[0-9a-z]{2}[0-9a-z]{7}\b'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-ptt"
+  - name: GITLAB_PTT
+    type: regex
+    pattern: 'glptt-[0-9a-f]{40}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-rrt"
+  - name: GITLAB_RRT
+    type: regex
+    pattern: 'GR1348941[\w-]{20}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-runner-authentication-token"
+  - name: GITLAB_RUNNER_AUTHENTICATION_TOKEN
+    type: regex
+    pattern: 'glrt-[0-9a-zA-Z_\-]{20}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-runner-authentication-token-routable"
+  - name: GITLAB_RUNNER_AUTHENTICATION_TOKEN_ROUTABLE
+    type: regex
+    pattern: '\bglrt-t\d_[0-9a-zA-Z_\-]{27,300}\.[0-9a-z]{2}[0-9a-z]{7}\b'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-scim-token"
+  - name: GITLAB_SCIM_TOKEN
+    type: regex
+    pattern: 'glsoat-[0-9a-zA-Z_\-]{20}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitlab-session-cookie"
+  - name: GITLAB_SESSION_COOKIE
+    type: regex
+    pattern: '_gitlab_session=[0-9a-z]{32}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gitter-access-token"
+  - name: GITTER_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:gitter)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9_-]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "gocardless-api-token"
+  - name: GOCARDLESS_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:gocardless)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(live_(?i)[a-z0-9\-_=]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "grafana-api-key"
+  - name: GRAFANA_API_KEY
+    type: regex
+    pattern: '(?i)\b(eyJrIjoi[A-Za-z0-9]{70,400}={0,3})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "grafana-cloud-api-token"
+  - name: GRAFANA_CLOUD_API_TOKEN
+    type: regex
+    pattern: '(?i)\b(glc_[A-Za-z0-9+/]{32,400}={0,3})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "grafana-service-account-token"
+  - name: GRAFANA_SERVICE_ACCOUNT_TOKEN
+    type: regex
+    pattern: '(?i)\b(glsa_[A-Za-z0-9]{32}_[A-Fa-f0-9]{8})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "harness-api-key"
+  - name: HARNESS_API_KEY
+    type: regex
+    pattern: '(?:pat|sat)\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9]{24}\.[a-zA-Z0-9]{20}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "hashicorp-tf-api-token"
+  - name: HASHICORP_TF_API_TOKEN
+    type: regex
+    pattern: '(?i)[a-z0-9]{14}\.(?-i:atlasv1)\.[a-z0-9\-_=]{60,70}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "heroku-api-key"
+  - name: HEROKU_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:heroku)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "heroku-api-key-v2"
+  - name: HEROKU_API_KEY_V2
+    type: regex
+    pattern: '\b((HRKU-AA[0-9a-zA-Z_-]{58}))(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "hubspot-api-key"
+  - name: HUBSPOT_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:hubspot)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "huggingface-organization-api-token"
+  - name: HUGGINGFACE_ORGANIZATION_API_TOKEN
+    type: regex
+    pattern: '\b(api_org_(?i:[a-z]{34}))(?:[\x60''"\s;]|\\[nr]|$)'
+    category: ai
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "infracost-api-token"
+  - name: INFRACOST_API_TOKEN
+    type: regex
+    pattern: '\b(ico-[a-zA-Z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "intercom-api-key"
+  - name: INTERCOM_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:intercom)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{60})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "intra42-client-secret"
+  - name: INTRA42_CLIENT_SECRET
+    type: regex
+    pattern: '\b(s-s4t2(?:ud|af)-(?i)[abcdef0123456789]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "jfrog-api-key"
+  - name: JFROG_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:jfrog|artifactory|bintray|xray)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{73})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "jfrog-identity-token"
+  - name: JFROG_IDENTITY_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:jfrog|artifactory|bintray|xray)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "jwt"
+  - name: JWT
+    type: regex
+    pattern: '\b(ey[a-zA-Z0-9]{17,}\.ey[a-zA-Z0-9\/\\_-]{17,}\.(?:[a-zA-Z0-9\/\\_-]{10,}={0,2})?)(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "kraken-access-token"
+  - name: KRAKEN_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:kraken)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9\/=_\+\-]{80,90})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "kucoin-access-token"
+  - name: KUCOIN_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:kucoin)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{24})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "kucoin-secret-key"
+  - name: KUCOIN_SECRET_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:kucoin)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "launchdarkly-access-token"
+  - name: LAUNCHDARKLY_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:launchdarkly)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "linear-api-key"
+  - name: LINEAR_API_KEY
+    type: regex
+    pattern: 'lin_api_(?i)[a-z0-9]{40}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "linear-client-secret"
+  - name: LINEAR_CLIENT_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:linear)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "linkedin-client-id"
+  - name: LINKEDIN_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:linked[_-]?in)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{14})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "linkedin-client-secret"
+  - name: LINKEDIN_CLIENT_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:linked[_-]?in)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{16})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "lob-api-key"
+  - name: LOB_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:lob)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}((live|test)_[a-f0-9]{35})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "lob-pub-api-key"
+  - name: LOB_PUB_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:lob)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}((test|live)_pub_[a-f0-9]{31})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "looker-client-id"
+  - name: LOOKER_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:looker)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{20})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "looker-client-secret"
+  - name: LOOKER_CLIENT_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:looker)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{24})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "mailchimp-api-key"
+  - name: MAILCHIMP_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:MailchimpSDK.initialize|mailchimp)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{32}-us\d\d)(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "mailgun-private-api-token"
+  - name: MAILGUN_PRIVATE_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:mailgun)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(key-[a-f0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "mailgun-pub-key"
+  - name: MAILGUN_PUB_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:mailgun)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(pubkey-[a-f0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "mailgun-signing-key"
+  - name: MAILGUN_SIGNING_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:mailgun)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-h0-9]{32}-[a-h0-9]{8}-[a-h0-9]{8})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "mapbox-api-token"
+  - name: MAPBOX_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:mapbox)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(pk\.[a-z0-9]{60}\.[a-z0-9]{22})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "mattermost-access-token"
+  - name: MATTERMOST_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:mattermost)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{26})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "maxmind-license-key"
+  - name: MAXMIND_LICENSE_KEY
+    type: regex
+    pattern: '\b([A-Za-z0-9]{6}_[A-Za-z0-9]{29}_mmk)(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "messagebird-api-token"
+  - name: MESSAGEBIRD_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:message[_-]?bird)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{25})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "messagebird-client-id"
+  - name: MESSAGEBIRD_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:message[_-]?bird)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "microsoft-teams-webhook"
+  - name: MICROSOFT_TEAMS_WEBHOOK
+    type: regex
+    pattern: 'https://[a-z0-9]+\.webhook\.office\.com/webhookb2/[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}@[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}/IncomingWebhook/[a-z0-9]{32}/[a-z0-9]{8}-([a-z0-9]{4}-){3}[a-z0-9]{12}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "netlify-access-token"
+  - name: NETLIFY_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:netlify)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{40,46})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "new-relic-browser-api-token"
+  - name: NEW_RELIC_BROWSER_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:new-relic|newrelic|new_relic)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(NRJS-[a-f0-9]{19})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "new-relic-insert-key"
+  - name: NEW_RELIC_INSERT_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:new-relic|newrelic|new_relic)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(NRII-[a-z0-9-]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "new-relic-user-api-id"
+  - name: NEW_RELIC_USER_API_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:new-relic|newrelic|new_relic)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "new-relic-user-api-key"
+  - name: NEW_RELIC_USER_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:new-relic|newrelic|new_relic)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(NRAK-[a-z0-9]{27})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "notion-api-token"
+  - name: NOTION_API_TOKEN
+    type: regex
+    pattern: '\b(ntn_[0-9]{11}[A-Za-z0-9]{32}[A-Za-z0-9]{3})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "nytimes-access-token"
+  - name: NYTIMES_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:nytimes|new-york-times,|newyorktimes)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9=_\-]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "octopus-deploy-api-key"
+  - name: OCTOPUS_DEPLOY_API_KEY
+    type: regex
+    pattern: '\b(API-[A-Z0-9]{26})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "okta-access-token"
+  - name: OKTA_ACCESS_TOKEN
+    type: regex
+    pattern: '[\w.-]{0,50}?(?i:[\w.-]{0,50}?(?:(?-i:[Oo]kta|OKTA))(?:[ \t\w.-]{0,20})[\s''"]{0,3})(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(00[\w=\-]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "openshift-user-token"
+  - name: OPENSHIFT_USER_TOKEN
+    type: regex
+    pattern: '\b(sha256~[\w-]{43})(?:[^\w-]|\z)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "perplexity-api-key"
+  - name: PERPLEXITY_API_KEY
+    type: regex
+    pattern: '\b(pplx-[a-zA-Z0-9]{48})(?:[\x60''"\s;]|\\[nr]|$|\b)'
+    category: ai
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "plaid-api-token"
+  - name: PLAID_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:plaid)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(access-(?:sandbox|development|production)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "plaid-client-id"
+  - name: PLAID_CLIENT_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:plaid)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{24})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "plaid-secret-key"
+  - name: PLAID_SECRET_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:plaid)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{30})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "planetscale-api-token"
+  - name: PLANETSCALE_API_TOKEN
+    type: regex
+    pattern: '\b(pscale_tkn_(?i)[\w=\.-]{32,64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "planetscale-oauth-token"
+  - name: PLANETSCALE_OAUTH_TOKEN
+    type: regex
+    pattern: '\b(pscale_oauth_[\w=\.-]{32,64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "planetscale-password"
+  - name: PLANETSCALE_PASSWORD
+    type: regex
+    pattern: '(?i)\b(pscale_pw_(?i)[\w=\.-]{32,64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "postman-api-token"
+  - name: POSTMAN_API_TOKEN
+    type: regex
+    pattern: '\b(PMAK-(?i)[a-f0-9]{24}\-[a-f0-9]{34})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "prefect-api-token"
+  - name: PREFECT_API_TOKEN
+    type: regex
+    pattern: '\b(pnu_[a-zA-Z0-9]{36})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "privateai-api-token"
+  - name: PRIVATEAI_API_TOKEN
+    type: regex
+    pattern: '[\w.-]{0,50}?(?i:[\w.-]{0,50}?(?:private[_-]?ai)(?:[ \t\w.-]{0,20})[\s''"]{0,3})(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{32})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "pulumi-api-token"
+  - name: PULUMI_API_TOKEN
+    type: regex
+    pattern: '\b(pul-[a-f0-9]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "pypi-upload-token"
+  - name: PYPI_UPLOAD_TOKEN
+    type: regex
+    pattern: 'pypi-AgEIcHlwaS5vcmc[\w-]{50,1000}'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "rapidapi-access-token"
+  - name: RAPIDAPI_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:rapidapi)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9_-]{50})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "readme-api-token"
+  - name: README_API_TOKEN
+    type: regex
+    pattern: '\b(rdme_[a-z0-9]{70})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "rubygems-api-token"
+  - name: RUBYGEMS_API_TOKEN
+    type: regex
+    pattern: '\b(rubygems_[a-f0-9]{48})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "scalingo-api-token"
+  - name: SCALINGO_API_TOKEN
+    type: regex
+    pattern: '\b(tk-us-[\w-]{48})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sendbird-access-id"
+  - name: SENDBIRD_ACCESS_ID
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:sendbird)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sendbird-access-token"
+  - name: SENDBIRD_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:sendbird)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sendinblue-api-token"
+  - name: SENDINBLUE_API_TOKEN
+    type: regex
+    pattern: '\b(xkeysib-[a-f0-9]{64}\-(?i)[a-z0-9]{16})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sentry-access-token"
+  - name: SENTRY_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:sentry)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-f0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sentry-org-token"
+  - name: SENTRY_ORG_TOKEN
+    type: regex
+    pattern: '\bsntrys_eyJpYXQiO[a-zA-Z0-9+/]{10,200}(?:LCJyZWdpb25fdXJs|InJlZ2lvbl91cmwi|cmVnaW9uX3VybCI6)[a-zA-Z0-9+/]{10,200}={0,2}_[a-zA-Z0-9+/]{43}(?:[^a-zA-Z0-9+/]|\z)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sentry-user-token"
+  - name: SENTRY_USER_TOKEN
+    type: regex
+    pattern: '\b(sntryu_[a-f0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: dev
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "settlemint-application-access-token"
+  - name: SETTLEMINT_APPLICATION_ACCESS_TOKEN
+    type: regex
+    pattern: '\b(sm_aat_[a-zA-Z0-9]{16})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "settlemint-personal-access-token"
+  - name: SETTLEMINT_PERSONAL_ACCESS_TOKEN
+    type: regex
+    pattern: '\b(sm_pat_[a-zA-Z0-9]{16})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "settlemint-service-access-token"
+  - name: SETTLEMINT_SERVICE_ACCESS_TOKEN
+    type: regex
+    pattern: '\b(sm_sat_[a-zA-Z0-9]{16})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "shippo-api-token"
+  - name: SHIPPO_API_TOKEN
+    type: regex
+    pattern: '\b(shippo_(?:live|test)_[a-fA-F0-9]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "shopify-access-token"
+  - name: SHOPIFY_ACCESS_TOKEN
+    type: regex
+    pattern: 'shpat_[a-fA-F0-9]{32}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "shopify-custom-access-token"
+  - name: SHOPIFY_CUSTOM_ACCESS_TOKEN
+    type: regex
+    pattern: 'shpca_[a-fA-F0-9]{32}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "shopify-private-app-access-token"
+  - name: SHOPIFY_PRIVATE_APP_ACCESS_TOKEN
+    type: regex
+    pattern: 'shppa_[a-fA-F0-9]{32}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "shopify-shared-secret"
+  - name: SHOPIFY_SHARED_SECRET
+    type: regex
+    pattern: 'shpss_[a-fA-F0-9]{32}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "slack-app-token"
+  - name: SLACK_APP_TOKEN
+    type: regex
+    pattern: '(?i)xapp-\d-[A-Z0-9]+-\d+-[a-z0-9]+'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "slack-config-access-token"
+  - name: SLACK_CONFIG_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)xoxe.xox[bp]-\d-[A-Z0-9]{163,166}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "slack-config-refresh-token"
+  - name: SLACK_CONFIG_REFRESH_TOKEN
+    type: regex
+    pattern: '(?i)xoxe-\d-[A-Z0-9]{146}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "slack-legacy-bot-token"
+  - name: SLACK_LEGACY_BOT_TOKEN
+    type: regex
+    pattern: 'xoxb-[0-9]{8,14}-[a-zA-Z0-9]{18,26}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "slack-legacy-token"
+  - name: SLACK_LEGACY_TOKEN
+    type: regex
+    pattern: 'xox[os]-\d+-\d+-\d+-[a-fA-F\d]+'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "slack-legacy-workspace-token"
+  - name: SLACK_LEGACY_WORKSPACE_TOKEN
+    type: regex
+    pattern: 'xox[ar]-(?:\d-)?[0-9a-zA-Z]{8,48}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "slack-user-token"
+  - name: SLACK_USER_TOKEN
+    type: regex
+    pattern: 'xox[pe](?:-[0-9]{10,13}){3}-[a-zA-Z0-9-]{28,34}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "snyk-api-token"
+  - name: SNYK_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:snyk[_.-]?(?:(?:api|oauth)[_.-]?)?(?:key|token))(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sonar-api-token"
+  - name: SONAR_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:sonar[_.-]?(login|token))(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}((?:squ_|sqp_|sqa_)?[a-z0-9=_\-]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sourcegraph-access-token"
+  - name: SOURCEGRAPH_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)\b(\b(sgp_(?:[a-fA-F0-9]{16}|local)_[a-fA-F0-9]{40}|sgp_[a-fA-F0-9]{40}|[a-fA-F0-9]{40})\b)(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "square-access-token"
+  - name: SQUARE_ACCESS_TOKEN
+    type: regex
+    pattern: '\b((?:EAAA|sq0atp-)[\w-]{22,60})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "squarespace-access-token"
+  - name: SQUARESPACE_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:squarespace)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sumologic-access-id"
+  - name: SUMOLOGIC_ACCESS_ID
+    type: regex
+    pattern: '[\w.-]{0,50}?(?i:[\w.-]{0,50}?(?:(?-i:[Ss]umo|SUMO))(?:[ \t\w.-]{0,20})[\s''"]{0,3})(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(su[a-zA-Z0-9]{12})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "sumologic-access-token"
+  - name: SUMOLOGIC_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:(?-i:[Ss]umo|SUMO))(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{64})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "telegram-bot-api-token"
+  - name: TELEGRAM_BOT_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:telegr)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9]{5,16}:(?-i:A)[a-z0-9_\-]{34})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "travisci-access-token"
+  - name: TRAVISCI_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:travis)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{22})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "twilio-api-key"
+  - name: TWILIO_API_KEY
+    type: regex
+    pattern: 'SK[0-9a-fA-F]{32}'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "twitch-api-token"
+  - name: TWITCH_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:twitch)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{30})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "twitter-access-secret"
+  - name: TWITTER_ACCESS_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:twitter)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{45})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "twitter-access-token"
+  - name: TWITTER_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:twitter)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([0-9]{15,25}-[a-zA-Z0-9]{20,40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "twitter-api-key"
+  - name: TWITTER_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:twitter)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{25})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "twitter-api-secret"
+  - name: TWITTER_API_SECRET
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:twitter)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{50})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "twitter-bearer-token"
+  - name: TWITTER_BEARER_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:twitter)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(A{22}[a-zA-Z0-9%]{80,100})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "typeform-api-token"
+  - name: TYPEFORM_API_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:typeform)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(tfp_[a-z0-9\-_\.=]{59})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "vault-batch-token"
+  - name: VAULT_BATCH_TOKEN
+    type: regex
+    pattern: '\b(hvb\.[\w-]{138,300})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "vault-service-token"
+  - name: VAULT_SERVICE_TOKEN
+    type: regex
+    pattern: '\b((?:hvs\.[\w-]{90,120}|s\.(?i:[a-z0-9]{24})))(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "yandex-access-token"
+  - name: YANDEX_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:yandex)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(t1\.[A-Z0-9a-z_-]+[=]{0,2}\.[A-Z0-9a-z_-]{86}[=]{0,2})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "yandex-api-key"
+  - name: YANDEX_API_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:yandex)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(AQVN[A-Za-z0-9_\-]{35,38})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "yandex-aws-access-token"
+  - name: YANDEX_AWS_ACCESS_TOKEN
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:yandex)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}(YC[a-zA-Z0-9_\-]{38})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
+    confidence: certain
+
+  # source: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml -- rule id "zendesk-secret-key"
+  - name: ZENDESK_SECRET_KEY
+    type: regex
+    pattern: '(?i)[\w.-]{0,50}?(?:zendesk)(?:[ \t\w.-]{0,20})[\s''"]{0,3}(?:=|>|:{1,3}=|\|\||:|=>|\?=|,)[\x60''"\s=]{0,5}([a-z0-9]{40})(?:[\x60''"\s;]|\\[nr]|$)'
+    category: api
     confidence: certain

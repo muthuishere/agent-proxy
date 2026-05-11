@@ -107,6 +107,11 @@ tasks:
     cmds:
       - bash tests/integration/e2e-agents/test-copilot-e2e.sh
 
+  test-e2e-secret-roundtrip:
+    desc: "Manual: inject JWT-shaped synthetic secret through each CLI; assert mask+restore via /api/traffic"
+    cmds:
+      - bash tests/integration/e2e-agents/test-secret-roundtrip.sh
+
   test-cov:
     desc: "Run all Go tests with coverage report"
     cmds:

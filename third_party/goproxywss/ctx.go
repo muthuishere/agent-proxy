@@ -48,6 +48,15 @@ func (ctx *ProxyCtx) RoundTrip(req *http.Request) (*http.Response, error) {
 	if ctx.RoundTripper != nil {
 		return ctx.RoundTripper.RoundTrip(req, ctx)
 	}
+	// Route WebSocket upgrade requests through a dedicated transport (when
+	// configured) so the upstream connection is forced onto HTTP/1.1.
+	// resp.Body.(io.ReadWriter) — required by the WS upgrade hijack path —
+	// only works on HTTP/1.1 101 responses; Go's default transport will
+	// silently pick HTTP/2 via ALPN for hosts like chatgpt.com and the
+	// upgrade then fails intermittently.
+	if ctx.Proxy.WebSocketUpstreamTransport != nil && isWebSocketHandshake(req.Header) {
+		return ctx.Proxy.WebSocketUpstreamTransport.RoundTrip(req)
+	}
 	return ctx.Proxy.Tr.RoundTrip(req)
 }
 

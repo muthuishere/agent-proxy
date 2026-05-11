@@ -3,12 +3,14 @@ package proxy
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"sync/atomic"
 	"time"
+	"unicode/utf8"
 
 	"github.com/elazarl/goproxy"
 	"github.com/muthuishere/agentproxy/internal/config"
@@ -52,6 +54,30 @@ type Server struct {
 func New(cfg config.Config, service *agentruntime.Service, opts Options) *Server {
 	handler := goproxy.NewProxyHttpServer()
 	handler.Verbose = opts.Verbose
+
+	// Force HTTP/1.1 for upstream WebSocket requests.
+	// Why: goproxy hijacks the 101 response by type-asserting resp.Body to
+	// io.ReadWriter, which Go's net/http only exposes on HTTP/1.1 upgrades.
+	// chatgpt.com (Codex) advertises HTTP/2 via ALPN, so Go's default
+	// Transport negotiates h2 and the WS upgrade fails intermittently
+	// ("Unable to use Websocket connection" / "Handshake not finished").
+	// Empty TLSNextProto disables HTTP/2 ALPN for THIS transport only;
+	// non-WS traffic still uses the default h2-capable handler.Tr.
+	handler.WebSocketUpstreamTransport = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		// Pin ALPN to http/1.1 so the upstream TLS handshake never offers h2.
+		// Without this, even with TLSNextProto={} on the Transport, the
+		// TLS layer can negotiate h2 if NextProtos is left at Go's default
+		// ["h2","http/1.1"], and the WS upgrade silently fails.
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+			NextProtos:         []string{"http/1.1"},
+		},
+		// Belt-and-braces: empty (but non-nil) TLSNextProto also disables
+		// HTTP/2 dispatch at the http.Transport level.
+		TLSNextProto: map[string]func(authority string, c *tls.Conn) http.RoundTripper{},
+	}
+
 	handler.OnRequest().HandleConnectFunc(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
 		if service.ShouldIntercept(host) {
 			return goproxy.MitmConnect, host
@@ -78,6 +104,16 @@ func New(cfg config.Config, service *agentruntime.Service, opts Options) *Server
 	})
 	handler.OnResponse().DoFunc(func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
 		if resp == nil || resp.Request == nil || resp.Body == nil {
+			return resp
+		}
+		// WebSocket 101 upgrade: do NOT read or replace the body. resp.Body
+		// is the hijacked TLS conn (implements io.ReadWriter); goproxy's
+		// upgrade flow type-asserts it to splice the WS connection. If we
+		// io.ReadAll it here we'd block forever (no Content-Length) and
+		// destroy the cast — observed as "Unable to use Websocket connection"
+		// for Codex requests. WS frame masking happens later via
+		// WebSocketMessageHandler, not here.
+		if isWebSocketUpgrade(resp) {
 			return resp
 		}
 		reqID := requestIDFromCtx(ctx)
@@ -118,7 +154,19 @@ func New(cfg config.Config, service *agentruntime.Service, opts Options) *Server
 		return ctx != nil && ctx.Req != nil && service.ShouldIntercept(hostFromRequest(ctx.Req))
 	}
 	handler.WebSocketMessageHandler = func(ctx *goproxy.ProxyCtx, direction goproxy.WebSocketDirection, frame goproxy.WebSocketFrame) (goproxy.WebSocketFrame, error) {
-		if ctx == nil || ctx.Req == nil || frame.Opcode != 0x1 {
+		if ctx == nil || ctx.Req == nil {
+			return frame, nil
+		}
+		// Process TEXT (0x1) and BINARY (0x2) frames. Codex/chatgpt.com sends
+		// JSON wrapped in binary frames; restricting to opcode 0x1 alone makes
+		// masking silently skip every Codex prompt. Only valid UTF-8 binary
+		// payloads are routed through the scanner; truly binary frames (image
+		// bytes, audio, etc.) pass unchanged because the masker won't match
+		// anyway and we forward the original bytes on substitution miss.
+		if frame.Opcode != 0x1 && frame.Opcode != 0x2 {
+			return frame, nil
+		}
+		if frame.Opcode == 0x2 && !utf8.Valid(frame.Payload) {
 			return frame, nil
 		}
 		reqID := requestIDFromCtx(ctx)
@@ -175,4 +223,16 @@ func sessionID(ctx *goproxy.ProxyCtx) string {
 
 func isSSE(resp *http.Response) bool {
 	return strings.Contains(resp.Header.Get("Content-Type"), "text/event-stream")
+}
+
+// isWebSocketUpgrade returns true for the 101 Switching Protocols response
+// that completes a WebSocket handshake. Detected as: status=101 AND
+// Upgrade header contains "websocket". We do not read or rewrite the body
+// of such responses — goproxy's hijack flow needs resp.Body to still be the
+// raw io.ReadWriter for splicing WS frames.
+func isWebSocketUpgrade(resp *http.Response) bool {
+	if resp.StatusCode != http.StatusSwitchingProtocols {
+		return false
+	}
+	return strings.EqualFold(resp.Header.Get("Upgrade"), "websocket")
 }

@@ -223,12 +223,23 @@ func (s *Service) HandleWebSocket(sessionID string, host, path, text string, fro
 	if fromClient {
 		masked, maskedCount, patterns := s.maskText(sessionID, text)
 		_ = s.logger.LogWebSocket(host, path, "client->server", text, masked, maskedCount, patterns, requestID)
+		// Mirror HandleRequest: surface frame-level masking in the dashboard
+		// EventStore so /api/traffic/{id} replacements reflect WS prompts the
+		// same way it reflects HTTP prompts. Without this, Codex traffic
+		// looks "clean" in the dashboard even though masking happened.
+		if s.sink != nil && maskedCount > 0 {
+			sess := s.vaultManager.Session(sessionID)
+			s.sink.RecordRequest(requestID, host, path, "WS", text, masked, sess.Replacements())
+		}
 		return masked, maskedCount
 	}
 	session := s.vaultManager.Session(sessionID)
 	restored := session.Restore(text)
 	restored = codec.RestoreEncodedBlobs(restored, session, codec.EncodedBlobOptions{Strategy: codec.EmbeddedTokens})
 	_ = s.logger.LogWebSocket(host, path, "server->client", text, restored, 0, nil, requestID)
+	if s.sink != nil && restored != text {
+		s.sink.RecordResponse(requestID, 0, text, restored, session.Replacements())
+	}
 	return restored, 0
 }
 
