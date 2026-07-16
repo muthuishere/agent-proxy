@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muthuishere/agentproxy/internal/vault"
+	"github.com/muthuishere/agent-proxy/internal/vault"
 )
 
 func TestTrafficDetailEndpointReturnsRecordedEvent(t *testing.T) {

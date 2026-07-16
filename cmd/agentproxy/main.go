@@ -1,3 +1,6 @@
+// Command agentproxy is a local MITM proxy that sits between AI coding
+// agents and their remote APIs, masking secrets in outbound traffic and
+// restoring them in the response.
 package main
 
 import (
@@ -11,10 +14,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/muthuishere/agentproxy/internal/config"
-	"github.com/muthuishere/agentproxy/internal/proxy"
-	agentruntime "github.com/muthuishere/agentproxy/internal/runtime"
-	"github.com/muthuishere/agentproxy/internal/ui"
+	"github.com/muthuishere/agent-proxy/internal/config"
+	"github.com/muthuishere/agent-proxy/internal/proxy"
+	agentruntime "github.com/muthuishere/agent-proxy/internal/runtime"
+	"github.com/muthuishere/agent-proxy/internal/ui"
 )
 
 var version = "0.1.0-go-migration"

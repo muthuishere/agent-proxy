@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/muthuishere/agentproxy/internal/config"
-	agentruntime "github.com/muthuishere/agentproxy/internal/runtime"
+	"github.com/muthuishere/agent-proxy/internal/config"
+	agentruntime "github.com/muthuishere/agent-proxy/internal/runtime"
 )
 
 func main() {

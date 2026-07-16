@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/muthuishere/agentproxy/internal/vault"
+	"github.com/muthuishere/agent-proxy/internal/vault"
 )
 
 // MaskingEvent is the per-request payload the dashboard reads to show the

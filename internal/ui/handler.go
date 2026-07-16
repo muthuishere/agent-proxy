@@ -12,7 +12,7 @@ import (
 
 	_ "embed"
 
-	"github.com/muthuishere/agentproxy/internal/logger"
+	"github.com/muthuishere/agent-proxy/internal/logger"
 )
 
 //go:embed dashboard.html
