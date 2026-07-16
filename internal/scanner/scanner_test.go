@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/muthuishere/agentproxy/internal/patterns"
+	"github.com/muthuishere/agent-proxy/internal/patterns"
 )
 
 func TestNewFromFileLoadsAndFiltersPatterns(t *testing.T) {

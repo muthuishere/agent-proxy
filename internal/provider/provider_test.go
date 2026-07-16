@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/muthuishere/agentproxy/internal/provider"
+	"github.com/muthuishere/agent-proxy/internal/provider"
 )
 
 func buildRegistry() *provider.Registry {

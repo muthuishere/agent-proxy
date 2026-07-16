@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/muthuishere/agentproxy/internal/codec"
+	"github.com/muthuishere/agent-proxy/internal/codec"
 )
 
 // sseSession is the subset of vault.Session used by the streaming reader.

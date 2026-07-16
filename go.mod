@@ -1,4 +1,4 @@
-module github.com/muthuishere/agentproxy
+module github.com/muthuishere/agent-proxy
 
 go 1.23.7
 

@@ -13,8 +13,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/elazarl/goproxy"
-	"github.com/muthuishere/agentproxy/internal/config"
-	agentruntime "github.com/muthuishere/agentproxy/internal/runtime"
+	"github.com/muthuishere/agent-proxy/internal/config"
+	agentruntime "github.com/muthuishere/agent-proxy/internal/runtime"
 )
 
 var requestCounter atomic.Uint64

@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/muthuishere/agentproxy/internal/codec"
-	"github.com/muthuishere/agentproxy/internal/config"
-	"github.com/muthuishere/agentproxy/internal/logger"
-	"github.com/muthuishere/agentproxy/internal/provider"
-	"github.com/muthuishere/agentproxy/internal/scanner"
-	"github.com/muthuishere/agentproxy/internal/vault"
+	"github.com/muthuishere/agent-proxy/internal/codec"
+	"github.com/muthuishere/agent-proxy/internal/config"
+	"github.com/muthuishere/agent-proxy/internal/logger"
+	"github.com/muthuishere/agent-proxy/internal/provider"
+	"github.com/muthuishere/agent-proxy/internal/scanner"
+	"github.com/muthuishere/agent-proxy/internal/vault"
 )
 
 var defaultDomains = map[string]struct{}{

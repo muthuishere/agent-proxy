@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/muthuishere/agentproxy/internal/vault"
+	"github.com/muthuishere/agent-proxy/internal/vault"
 )
 
 type scanner struct {

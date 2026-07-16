@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/muthuishere/agentproxy/internal/config"
-	"github.com/muthuishere/agentproxy/internal/vault"
+	"github.com/muthuishere/agent-proxy/internal/config"
+	"github.com/muthuishere/agent-proxy/internal/vault"
 )
 
 func TestHandleRequestMasksAndRestoresResponse(t *testing.T) {

@@ -1,5 +1,7 @@
 # AgentProxy
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/muthuishere/agent-proxy.svg)](https://pkg.go.dev/github.com/muthuishere/agent-proxy)
+
 A local MITM proxy that sits between AI coding agents (Claude, Codex, Copilot, etc.) and their remote APIs. It intercepts outbound traffic, detects secrets in prompts, masks them before they leave your machine, and restores them in the response — so the agent works normally and your secrets never hit the wire.
 
 **Zero cloud dependency. Runs entirely on your machine. No code changes to your agents.**

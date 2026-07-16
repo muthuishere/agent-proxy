@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/muthuishere/agentproxy/internal/config"
+	"github.com/muthuishere/agent-proxy/internal/config"
 )
 
 const defaultCACertEnv = "AGENTPROXY_CA_CERT"

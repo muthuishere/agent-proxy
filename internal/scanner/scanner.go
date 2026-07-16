@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/muthuishere/agentproxy/internal/patterns"
+	"github.com/muthuishere/agent-proxy/internal/patterns"
 )
 
 type Match struct {

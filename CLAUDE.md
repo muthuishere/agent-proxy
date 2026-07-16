@@ -17,7 +17,7 @@ The launch slices in `docs/specs/index-launch-slices.md` are the canonical roadm
 
 AgentProxy is a local MITM proxy that intercepts HTTP/HTTPS traffic from AI coding agents (Claude, Codex, Copilot), masks secrets before they reach upstream APIs, and restores them in responses. It runs entirely locally — no cloud account, no telemetry.
 
-**Module:** `github.com/muthuishere/agentproxy` (Go 1.23.7)
+**Module:** `github.com/muthuishere/agent-proxy` (Go 1.23.7)
 **License:** MIT
 **Vendored fork:** `github.com/elazarl/goproxy` is replaced by `./third_party/goproxywss` (adds WebSocket support).
 

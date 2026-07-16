@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muthuishere/agentproxy/internal/vault"
+	"github.com/muthuishere/agent-proxy/internal/vault"
 )
 
 func TestEventStoreRequestThenResponseSameID(t *testing.T) {
