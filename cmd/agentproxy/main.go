@@ -1,3 +1,6 @@
+// Command agentproxy is a local MITM proxy that sits between AI coding
+// agents and their remote APIs, masking secrets in outbound traffic and
+// restoring them in the response.
 package main
 
 import (
